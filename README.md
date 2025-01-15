@@ -49,9 +49,10 @@ This Chrome extension allows you to quickly translate selected text on any webpa
     - Click the "X" button in the dialog box to close it or click outside the dialog box to close it.
 4.  You can change the target language in the popup.
 
-## 📸 Screenshots
+## 📸 Screenshots (Popup and Select-translation)
 
 <img src="images/infographic.jpg" width="400" alt="Screenshot of the extension popup">
+<img src="images/selectTranslation.gif" width="400" alt="Select-translation showcase">
 
 ## 📋 Requirements
 
