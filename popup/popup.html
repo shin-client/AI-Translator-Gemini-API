@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Translator</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <section class="card">
+            <header class="card-header">
+                <h2>Translate Text</h2>
+            </header>
+            <div class="card-content">
+                <textarea id="text-to-translate" placeholder="Enter text to translate"></textarea>
+                <div class="input-container">
+                    <label for="text-target-language" class="select-label">Language</label>
+                    <select id="text-target-language">
+                        <option value="English">English</option>
+                        <option value="Polish">Polski</option>
+                        <option value="German">Deutsch</option>
+                        <option value="Spanish">Español</option>
+                        <option value="French">Français</option>
+                        <option value="Italian">Italiano</option>
+                        <option value="Portuguese">Português</option>
+                        <option value="Russian">Русский</option>
+                        <option value="Chinese">中文</option>
+                        <option value="Japanese">日本語</option>
+                        <option value="Korean">한국어</option>
+                    </select>
+                    <button id="translate-text-button">Translate</button>
+                </div>
+                <p id="text-translation-status" class="status"></p>
+            </div>
+        </section>
+        <section class="card">
+            <header class="card-header">
+                <h2>Translation</h2>
+            </header>
+            <div class="card-content">
+                <textarea id="translated-text" placeholder="Translation" readonly></textarea>
+            </div>
+        </section>
+        <section id="api-key-card" class="card collapsed">
+            <header class="card-header">
+                <h2>API Key</h2>
+                <span class="api-key-status-icon"></span>
+                <button class="collapse-button"></button>
+            </header>
+            <div class="card-content">
+                <div id="api-key-box">
+                    <input type="password" id="api-key-input" placeholder="Gemini-2.0-flash API Key">
+                    <span class="api-key-clear-icon" title="Remove API Key"></span>
+                </div>
+                <button id="save-api-key-button">Save API Key</button>
+                <p id="api-key-status" class="status"></p>
+            </div>
+        </section>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html> 
