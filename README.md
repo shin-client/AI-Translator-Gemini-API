@@ -51,7 +51,7 @@ This Chrome extension allows you to quickly translate selected text on any webpa
 
 ## 📸 Screenshots
 
-<img src="images/popupScreenshot2.png" width="400" alt="Screenshot of the extension popup">
+<img src="images/infographic.png" width="400" alt="Screenshot of the extension popup">
 
 ## 📋 Requirements
 
