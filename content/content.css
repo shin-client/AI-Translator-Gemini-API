@@ -1,4 +1,4 @@
-.translation-selected-text-icon {
+.aiGeminiTranslator_translation-selected-text-icon {
     position: absolute;
     cursor: pointer;
     z-index: 10000;
@@ -11,18 +11,18 @@
     transition: transform 0.1s;
 }
 
-.translation-selected-text-icon:hover {
+.aiGeminiTranslator_translation-selected-text-icon:hover {
     transform: scale(1.1);
 }
 
-.translation-selected-text-icon .translation-selected-text-icon-image {
+.aiGeminiTranslator_translation-selected-text-icon .aiGeminiTranslator_translation-selected-text-icon-image {
     all: unset;
     width: 20px;
     height: 20px;
     display: block;
 }
 
-.translation-dialog {
+.aiGeminiTranslator_translation-dialog {
     position: absolute;
     background-color: #ffffff;
     color: #333333;
@@ -41,21 +41,21 @@
     transition: opacity 0.2s;
 }
 
-.translation-content {
+.aiGeminiTranslator_translation-content {
     text-align: left;
     font-family: 'Roboto', sans-serif;
 }
 
-.loadingGeminiTranslation {
+.aiGeminiTranslator_loadingGeminiTranslation {
     width: 20px;
     height: 20px;
     border: 2px solid #bb86fc;
     border-radius: 50%;
     background: transparent;
-    animation: pulse 0.5s ease-in-out infinite;
+    animation: aiGeminiTranslator_pulse 0.5s ease-in-out infinite;
 }
 
-@keyframes pulse {
+@keyframes aiGeminiTranslator_pulse {
     0% {
         transform: scale(0.5);
         opacity: 0.5;

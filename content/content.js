@@ -44,8 +44,8 @@ document.addEventListener('mousedown', (event) => {
 function showTranslationIcon(event) {
     if (!icon) {
         icon = document.createElement('div');
-        icon.className = 'translation-selected-text-icon';
-        icon.innerHTML = `<img class="translation-selected-text-icon-image" src="${chrome.runtime.getURL('images/icon48.png')}" alt="Translate">`;
+        icon.className = 'aiGeminiTranslator_translation-selected-text-icon';
+        icon.innerHTML = `<img class="aiGeminiTranslator_translation-selected-text-icon-image" src="${chrome.runtime.getURL('images/icon48.png')}" alt="Translate">`;
         icon.addEventListener('click', translateSelectedText);
         document.body.appendChild(icon);
     }
@@ -84,7 +84,7 @@ async function translateSelectedText() {
 
     // Show loading state
     const originalIcon = icon.innerHTML;
-    icon.innerHTML = '<div class="loadingGeminiTranslation"></div>';
+    icon.innerHTML = '<div class="aiGeminiTranslator_loadingGeminiTranslation"></div>';
     icon.style.padding = '8px';
 
     chrome.runtime.sendMessage({
@@ -115,7 +115,7 @@ function showDialogBox(translatedText) {
     const iconTop = parseInt(icon.style.top);
 
     dialogBox = document.createElement('div');
-    dialogBox.className = 'translation-dialog';
+    dialogBox.className = 'aiGeminiTranslator_translation-dialog';
 
     // Position dialog at the icon's location
     dialogBox.style.left = `${iconLeft}px`;
@@ -123,7 +123,7 @@ function showDialogBox(translatedText) {
 
     // Create content container
     const content = document.createElement('div');
-    content.className = 'translation-content';
+    content.className = 'aiGeminiTranslator_translation-content';
     content.textContent = translatedText;
 
     dialogBox.appendChild(content);

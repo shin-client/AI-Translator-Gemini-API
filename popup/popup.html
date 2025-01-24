@@ -7,16 +7,16 @@
     <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-    <div class="container">
-        <section class="card">
-            <header class="card-header">
+    <div class="aiGeminiTranslator_container">
+        <section class="aiGeminiTranslator_card">
+            <header class="aiGeminiTranslator_card-header">
                 <h2>Translate Text</h2>
             </header>
-            <div class="card-content">
-                <textarea id="text-to-translate" placeholder="Enter text to translate"></textarea>
-                <div class="input-container">
-                    <label for="text-target-language" class="select-label">Language</label>
-                    <select id="text-target-language">
+            <div class="aiGeminiTranslator_card-content">
+                <textarea id="aiGeminiTranslator_text-to-translate" placeholder="Enter text to translate"></textarea>
+                <div class="aiGeminiTranslator_input-container">
+                    <label for="aiGeminiTranslator_text-target-language" class="aiGeminiTranslator_select-label">Language</label>
+                    <select id="aiGeminiTranslator_text-target-language">
                         <option value="English">English</option>
                         <option value="Polish">Polski</option>
                         <option value="German">Deutsch</option>
@@ -29,35 +29,35 @@
                         <option value="Japanese">日本語</option>
                         <option value="Korean">한국어</option>
                     </select>
-                    <button id="translate-text-button">Translate</button>
+                    <button id="aiGeminiTranslator_translate-text-button">Translate</button>
                 </div>
-                <p id="text-translation-status" class="status"></p>
+                <p id="aiGeminiTranslator_text-translation-status" class="aiGeminiTranslator_status"></p>
             </div>
         </section>
-        <section class="card">
-            <header class="card-header">
+        <section class="aiGeminiTranslator_card">
+            <header class="aiGeminiTranslator_card-header">
                 <h2>Translation</h2>
             </header>
-            <div class="card-content">
-                <textarea id="translated-text" placeholder="Translation" readonly></textarea>
+            <div class="aiGeminiTranslator_card-content">
+                <textarea id="aiGeminiTranslator_translated-text" placeholder="Translation" readonly></textarea>
             </div>
         </section>
-        <section id="api-key-card" class="card collapsed">
-            <header class="card-header">
+        <section id="aiGeminiTranslator_api-key-card" class="aiGeminiTranslator_card collapsed">
+            <header class="aiGeminiTranslator_card-header">
                 <h2>API Key</h2>
-                <span class="api-key-status-icon"></span>
-                <button class="collapse-button"></button>
+                <span class="aiGeminiTranslator_api-key-status-icon"></span>
+                <button class="aiGeminiTranslator_collapse-button"></button>
             </header>
-            <div class="card-content">
-                <div id="api-key-box">
-                    <input type="password" id="api-key-input" placeholder="Gemini-2.0-flash API Key">
-                    <span class="api-key-clear-icon" title="Remove API Key"></span>
+            <div class="aiGeminiTranslator_card-content">
+                <div id="aiGeminiTranslator_api-key-box">
+                    <input type="password" id="aiGeminiTranslator_api-key-input" placeholder="Gemini-2.0-flash API Key">
+                    <span class="aiGeminiTranslator_api-key-clear-icon" title="Remove API Key"></span>
                 </div>
-                <button id="save-api-key-button">Save API Key</button>
-                <p id="api-key-status" class="status"></p>
+                <button id="aiGeminiTranslator_save-api-key-button">Save API Key</button>
+                <p id="aiGeminiTranslator_api-key-status" class="aiGeminiTranslator_status"></p>
             </div>
         </section>
     </div>
-    <script src="popup.js"></script>
+    <script type="module" src="popup.js"></script>
 </body>
 </html> 

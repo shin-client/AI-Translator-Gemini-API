@@ -1,37 +1,37 @@
+import config from '../background/config.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
-    const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
+    const API_URL = config.API_URL;
     let apiKey = '';
 
-    const apiKeyInput = document.getElementById('api-key-input');
-    const saveApiKeyButton = document.getElementById('save-api-key-button');
-    const textToTranslateTextarea = document.getElementById('text-to-translate');
-    const translatedTextTextarea = document.getElementById('translated-text');
-    const textTargetLanguageSelect = document.getElementById('text-target-language');
-    const translateTextButton = document.getElementById('translate-text-button');
-    const apiKeyStatus = document.getElementById('api-key-status');
-    const textTranslationStatus = document.getElementById('text-translation-status');
-    const apiKeyCard = document.getElementById('api-key-card');
-    const apiKeyCollapseButton = apiKeyCard.querySelector('.collapse-button');
-    const apiKeyStatusIcon = apiKeyCard.querySelector('.api-key-status-icon');
-    const apiKeyClearIcon = apiKeyCard.querySelector('.api-key-clear-icon');
+    const apiKeyInput = document.getElementById('aiGeminiTranslator_api-key-input');
+    const saveApiKeyButton = document.getElementById('aiGeminiTranslator_save-api-key-button');
+    const textToTranslateTextarea = document.getElementById('aiGeminiTranslator_text-to-translate');
+    const translatedTextTextarea = document.getElementById('aiGeminiTranslator_translated-text');
+    const textTargetLanguageSelect = document.getElementById('aiGeminiTranslator_text-target-language');
+    const translateTextButton = document.getElementById('aiGeminiTranslator_translate-text-button');
+    const apiKeyStatus = document.getElementById('aiGeminiTranslator_api-key-status');
+    const textTranslationStatus = document.getElementById('aiGeminiTranslator_text-translation-status');
+    const apiKeyCard = document.getElementById('aiGeminiTranslator_api-key-card');
+    const apiKeyCollapseButton = apiKeyCard.querySelector('.aiGeminiTranslator_collapse-button');
+    const apiKeyStatusIcon = apiKeyCard.querySelector('.aiGeminiTranslator_api-key-status-icon');
+    const apiKeyClearIcon = apiKeyCard.querySelector('.aiGeminiTranslator_api-key-clear-icon');
 
-    // Load API Key from storage
-    const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
+    // Load saved API key and target language
+    const { geminiApiKey, textTargetLanguage } = await chrome.storage.local.get(['geminiApiKey', 'textTargetLanguage']);
     if (geminiApiKey) {
-        apiKey = geminiApiKey;
         apiKeyInput.value = geminiApiKey;
-        apiKeyStatusIcon.classList.add('active');
-        apiKeyStatusIcon.classList.add('valid');
         apiKeyClearIcon.classList.add('active');
+        apiKeyStatusIcon.classList.add('valid');
     } else {
-        apiKeyStatusIcon.classList.add('active');
         apiKeyStatusIcon.classList.add('invalid');
     }
 
     // Load default target language for text translation
-    const { textTargetLanguage } = await chrome.storage.local.get(['textTargetLanguage']);
     if (textTargetLanguage) {
         textTargetLanguageSelect.value = textTargetLanguage;
+    } else {
+        textTargetLanguageSelect.value = config.DEFAULT_TARGET_LANGUAGE;
     }
 
     apiKeyCollapseButton.addEventListener('click', () => {
@@ -47,27 +47,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     apiKeyClearIcon.addEventListener('click', async () => {
-        apiKey = '';
         apiKeyInput.value = '';
         apiKeyClearIcon.classList.remove('active');
         apiKeyStatusIcon.classList.remove('valid');
-        apiKeyStatusIcon.classList.add('invalid');
         await chrome.storage.local.remove('geminiApiKey');
     });
 
     saveApiKeyButton.addEventListener('click', async () => {
         const newApiKey = apiKeyInput.value.trim();
         
-        // Sprawdź format klucza API
         if (!/^[A-Za-z0-9-_]{39}$/.test(newApiKey)) {
-            apiKeyStatus.textContent = 'Invalid API key format';
+            apiKeyStatus.textContent = config.API_KEY_INVALID_FORMAT_MESSAGE;
             apiKeyStatus.style.color = 'red';
             apiKeyStatus.classList.add('active');
             return;
         }
 
         if (!newApiKey) {
-            apiKeyStatus.textContent = 'API key cannot be empty';
+            apiKeyStatus.textContent = config.API_KEY_EMPTY_MESSAGE;
             apiKeyStatus.classList.add('active');
             apiKeyStatus.style.color = 'red';
             apiKeyStatusIcon.classList.remove('valid');
@@ -75,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        apiKeyStatus.textContent = 'Validating API key...';
+        apiKeyStatus.textContent = config.API_KEY_VALIDATION_MESSAGE;
         apiKeyStatus.classList.add('active');
         apiKeyStatus.style.color = 'orange';
         apiKeyStatusIcon.classList.remove('valid');
@@ -97,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             if (!response.ok) {
-                apiKeyStatus.textContent = 'Invalid API key. Please check your key and try again.';
+                apiKeyStatus.textContent = config.API_KEY_INVALID_MESSAGE;
                 apiKeyStatus.style.color = 'red';
                 apiKeyStatus.classList.add('active');
                 apiKeyStatusIcon.classList.remove('valid');
@@ -105,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            apiKeyStatus.textContent = 'API key is valid';
+            apiKeyStatus.textContent = config.API_KEY_VALID_MESSAGE;
             apiKeyStatus.style.color = 'green';
             apiKeyStatus.classList.add('active');
             apiKeyStatusIcon.classList.remove('invalid');
@@ -117,8 +114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 apiKeyStatus.classList.remove('active');
             }, 3000);
         } catch (error) {
-            console.error("Error during API key validation:", error);
-            apiKeyStatus.textContent = `API key validation failed: ${error.message}`;
+            apiKeyStatus.textContent = `Error: ${error.message}`;
             apiKeyStatus.style.color = 'red';
             apiKeyStatus.classList.add('active');
             apiKeyStatusIcon.classList.remove('valid');
@@ -128,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     translateTextButton.addEventListener('click', async () => {
         if (!apiKey) {
-            textTranslationStatus.textContent = 'Please set your API key first';
+            textTranslationStatus.textContent = config.API_KEY_NOT_SET_MESSAGE;
             textTranslationStatus.style.color = 'red';
             textTranslationStatus.classList.add('active');
             return;
@@ -140,13 +136,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!text) {
             translatedTextTextarea.value = '';
-            textTranslationStatus.textContent = 'Please enter text to translate';
+            textTranslationStatus.textContent = config.TEXT_TO_TRANSLATE_EMPTY_MESSAGE;
             textTranslationStatus.style.color = 'red';
             textTranslationStatus.classList.add('active');
             return;
         }
 
-        textTranslationStatus.textContent = 'Translating text...';
+        textTranslationStatus.textContent = config.TRANSLATION_IN_PROGRESS_MESSAGE;
         textTranslationStatus.style.color = 'yellow';
         textTranslationStatus.classList.add('active');
         translatedTextTextarea.value = '';
@@ -167,7 +163,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             if (!response.ok) {
-                textTranslationStatus.textContent = 'Translation failed.';
+                textTranslationStatus.textContent = config.TRANSLATION_FAILED_MESSAGE;
                 textTranslationStatus.style.color = 'red';
                 textTranslationStatus.classList.add('active');
                 return;
@@ -179,7 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     .replace(/^["']|["']$/g, '') // Usuń cudzysłowy
                     .replace(/^Translate to.*?: /i, ''); // Usuń prefiks "Translate to X:"
                 translatedTextTextarea.value = translatedText;
-                textTranslationStatus.textContent = 'Text translation complete';
+                textTranslationStatus.textContent = config.TRANSLATION_COMPLETE_MESSAGE;
                 textTranslationStatus.style.color = 'green';
                 textTranslationStatus.classList.add('active');
                 setTimeout(() => {
@@ -187,7 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     textTranslationStatus.classList.remove('active');
                 }, 3000);
             } else {
-                textTranslationStatus.textContent = 'Translation failed.';
+                textTranslationStatus.textContent = config.TRANSLATION_FAILED_MESSAGE;
                 textTranslationStatus.style.color = 'red';
                 textTranslationStatus.classList.add('active');
             }

@@ -1,4 +1,6 @@
-const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
+import config from './config.js';
+
+const API_URL = config.API_URL;
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'translateSelectedText') {
@@ -20,13 +22,7 @@ async function translateText(text, targetLanguage, sendResponse) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: `Translate the following text to ${targetLanguage}. If it's necessary, modify the text to sound natural for the ${targetLanguage}, use the appropriate grammar, do not translate proper names. In the response, provide only the translation text without any additional descriptions or explanations:\n${text}`
-                    }]
-                }]
-            })
+            body: JSON.stringify(config.TRANSLATION_REQUEST_BODY(text, targetLanguage))
         });
 
         if (!response.ok) {

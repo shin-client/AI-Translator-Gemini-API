@@ -77,3 +77,8 @@ Contributions are welcome! Please feel free to submit a pull request.
 
 ### v1.0.0
 - Initial release
+
+### v1.1.0
+- Changed translation request body
+- Added config file
+- Added prefix to all classes and IDs
