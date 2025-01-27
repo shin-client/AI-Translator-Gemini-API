@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load saved API key and target language
     const { geminiApiKey, textTargetLanguage } = await chrome.storage.local.get(['geminiApiKey', 'textTargetLanguage']);
     if (geminiApiKey) {
+        apiKey = geminiApiKey;
         apiKeyInput.value = geminiApiKey;
         apiKeyClearIcon.classList.add('active');
         apiKeyStatusIcon.classList.add('valid');
@@ -84,13 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: 'Test message'
-                        }]
-                    }]
-                })
+                body: JSON.stringify(config.TEST_MESSAGE_REQUEST_BODY)
             });
 
             if (!response.ok) {
@@ -123,6 +118,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     translateTextButton.addEventListener('click', async () => {
+        await translateText();
+    });
+
+    // Listen for changes in chrome.storage.local
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+        if (areaName === 'local' && changes.geminiApiKey) {
+            apiKey = changes.geminiApiKey.newValue || '';
+            apiKeyInput.value = apiKey;
+            if (apiKey) {
+                apiKeyStatusIcon.classList.remove('invalid');
+                apiKeyStatusIcon.classList.add('valid');
+                apiKeyClearIcon.classList.add('active');
+            } else {
+                apiKeyStatusIcon.classList.remove('valid');
+                apiKeyStatusIcon.classList.add('invalid');
+                apiKeyClearIcon.classList.remove('active');
+            }
+        }
+        if (areaName === 'local' && changes.textTargetLanguage) {
+            textTargetLanguageSelect.value = changes.textTargetLanguage.newValue;
+        }
+    });
+
+    textTargetLanguageSelect.addEventListener('change', async () => {
+        const targetLanguage = textTargetLanguageSelect.value;
+        await chrome.storage.local.set({ textTargetLanguage: targetLanguage });
+    });
+
+    textToTranslateTextarea.addEventListener('keydown', async (event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            await translateText();
+        }
+    });
+
+    async function translateText() {
         if (!apiKey) {
             textTranslationStatus.textContent = config.API_KEY_NOT_SET_MESSAGE;
             textTranslationStatus.style.color = 'red';
@@ -153,13 +184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: `Translate the following text to ${targetLanguage}. If it's necessary, modify the text to sound natural for the ${targetLanguage}, use the appropriate grammar, do not translate proper names. In the response, provide only the translation text without any additional descriptions or explanations:\n${text}`
-                        }]
-                    }]
-                })
+                body: JSON.stringify(config.TRANSLATION_REQUEST_BODY(text, targetLanguage))
             });
 
             if (!response.ok) {
@@ -193,30 +218,5 @@ document.addEventListener('DOMContentLoaded', async () => {
             textTranslationStatus.style.color = 'red';
             textTranslationStatus.classList.add('active');
         }
-    });
-
-    // Listen for changes in chrome.storage.local
-    chrome.storage.onChanged.addListener((changes, areaName) => {
-        if (areaName === 'local' && changes.geminiApiKey) {
-            apiKey = changes.geminiApiKey.newValue || '';
-            apiKeyInput.value = apiKey;
-            if (apiKey) {
-                apiKeyStatusIcon.classList.remove('invalid');
-                apiKeyStatusIcon.classList.add('valid');
-                apiKeyClearIcon.classList.add('active');
-            } else {
-                apiKeyStatusIcon.classList.remove('valid');
-                apiKeyStatusIcon.classList.add('invalid');
-                apiKeyClearIcon.classList.remove('active');
-            }
-        }
-        if (areaName === 'local' && changes.textTargetLanguage) {
-            textTargetLanguageSelect.value = changes.textTargetLanguage.newValue;
-        }
-    });
-
-    textTargetLanguageSelect.addEventListener('change', async () => {
-        const targetLanguage = textTargetLanguageSelect.value;
-        await chrome.storage.local.set({ textTargetLanguage: targetLanguage });
-    });
+    }
 }); 
