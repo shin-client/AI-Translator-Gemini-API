@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,13 +9,10 @@
 <body>
     <div class="aiGeminiTranslator_container">
         <section class="aiGeminiTranslator_card">
-            <header class="aiGeminiTranslator_card-header">
-                <h2>Translate Text</h2>
-            </header>
             <div class="aiGeminiTranslator_card-content">
-                <textarea id="aiGeminiTranslator_text-to-translate" placeholder="Enter text to translate"></textarea>
+                <textarea id="aiGeminiTranslator_text-to-translate"></textarea>
                 <div class="aiGeminiTranslator_input-container">
-                    <label for="aiGeminiTranslator_text-target-language" class="aiGeminiTranslator_select-label">Language</label>
+                    <label for="aiGeminiTranslator_text-target-language" id="aiGeminiTranslator_select-label"></label>
                     <select id="aiGeminiTranslator_text-target-language">
                         <option value="English">English</option>
                         <option value="Polish">Polski</option>
@@ -29,35 +26,32 @@
                         <option value="Japanese">日本語</option>
                         <option value="Korean">한국어</option>
                     </select>
-                    <button id="aiGeminiTranslator_translate-text-button">Translate</button>
+                    <button id="aiGeminiTranslator_translate-text-button"></button>
                 </div>
                 <p id="aiGeminiTranslator_text-translation-status" class="aiGeminiTranslator_status"></p>
             </div>
         </section>
         <section class="aiGeminiTranslator_card">
-            <header class="aiGeminiTranslator_card-header">
-                <h2>Translation</h2>
-            </header>
             <div class="aiGeminiTranslator_card-content">
-                <textarea id="aiGeminiTranslator_translated-text" placeholder="Translation" readonly></textarea>
+                <textarea id="aiGeminiTranslator_translated-text" readonly></textarea>
             </div>
         </section>
         <section id="aiGeminiTranslator_api-key-card" class="aiGeminiTranslator_card collapsed">
             <header class="aiGeminiTranslator_card-header">
-                <h2>API Key</h2>
+                <h2 id="aiGeminiTranslator_api-key-card-header-title"></h2>
                 <span class="aiGeminiTranslator_api-key-status-icon"></span>
                 <button class="aiGeminiTranslator_collapse-button"></button>
             </header>
             <div class="aiGeminiTranslator_card-content">
                 <div id="aiGeminiTranslator_api-key-box">
-                    <input type="password" id="aiGeminiTranslator_api-key-input" placeholder="Gemini-2.0-flash API Key">
+                    <input type="password" id="aiGeminiTranslator_api-key-input">
                     <span class="aiGeminiTranslator_api-key-clear-icon" title="Remove API Key"></span>
                 </div>
-                <button id="aiGeminiTranslator_save-api-key-button">Save API Key</button>
+                <button id="aiGeminiTranslator_save-api-key-button"></button>
                 <p id="aiGeminiTranslator_api-key-status" class="aiGeminiTranslator_status"></p>
             </div>
         </section>
     </div>
-    <script type="module" src="popup.js"></script>
+    <script type="module" src="popup.js"></script>  
 </body>
-</html> 
+</html>

@@ -1,4 +1,5 @@
 import config from './config.js';
+import translationRequest from './translationRequest.js';
 
 const API_URL = config.API_URL;
 
@@ -12,7 +13,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 async function translateText(text, targetLanguage, sendResponse) {
     const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
     if (!geminiApiKey) {
-        sendResponse({ translatedText: 'API key not set.' });
+        sendResponse({ translatedText: config.API_KEY_NOT_SET_MESSAGE });
+        return;
+    }
+
+    if (!text) {
+        sendResponse({ translatedText: config.TEXT_TO_TRANSLATE_EMPTY_MESSAGE });
         return;
     }
 
@@ -20,16 +26,16 @@ async function translateText(text, targetLanguage, sendResponse) {
         const response = await fetch(`${API_URL}?key=${geminiApiKey}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify(config.TRANSLATION_REQUEST_BODY(text, targetLanguage))
+            body: JSON.stringify(translationRequest(text, targetLanguage || config.DEFAULT_TARGET_LANGUAGE))
         });
 
         if (!response.ok) {
             const errorData = await response.json();
             console.error("API Error:", errorData);
             sendResponse({ 
-                translatedText: `Translation failed: ${errorData.error?.message || 'Unknown error'}` 
+                translatedText: `${config.TRANSLATION_FAILED_MESSAGE}: ${errorData.error?.message || 'Unknown error'}`
             });
             return;
         }
@@ -41,10 +47,10 @@ async function translateText(text, targetLanguage, sendResponse) {
                 .replace(/^Translate to.*?: /i, '');
             sendResponse({ translatedText });
         } else {
-            sendResponse({ translatedText: 'Translation failed.' });
+            sendResponse({ translatedText: `${config.TRANSLATION_FAILED_MESSAGE}.` });
         }
     } catch (error) {
         console.error("Error during text translation:", error);
-        sendResponse({ translatedText: `Translation failed: ${error.message}` });
+        sendResponse({ translatedText: `${config.TRANSLATION_FAILED_MESSAGE}: ${error.message}` });
     }
 } 

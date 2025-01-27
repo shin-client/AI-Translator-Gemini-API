@@ -1,15 +1,14 @@
 body {
-    font-family: 'Roboto', sans-serif;
-    width: 500px;
-    padding: 10px;
     background-color: #1e1e1e;
-    color: #e0e0e0;
-    margin: 0;
 }
 
 .aiGeminiTranslator_container {
     display: flex;
     flex-direction: column;
+    font-family: 'Roboto', sans-serif;
+    width: 500px;
+    color: #e0e0e0;
+    margin: 0;
 }
 
 .aiGeminiTranslator_card {
@@ -31,12 +30,12 @@ body {
 .aiGeminiTranslator_card-header h2 {
     margin: 0;
     color: #bb86fc;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 500;
 }
 
 .aiGeminiTranslator_card-content {
-    padding: 0 16px 16px;
+    padding: 10px;
 }
 
 .aiGeminiTranslator_card.collapsed .aiGeminiTranslator_card-content {
@@ -98,68 +97,73 @@ body {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f44336'%3E%3Cpath d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3E%3C/svg%3E");
 }
 
-.aiGeminiTranslator_select-label {
+#aiGeminiTranslator_select-label {
     display: inline-block;
-    margin-right: 8px;
-    color: #e0e0e0;
-    font-size: 1rem;
+    margin-right: 0.3rem;
 }
 
 .aiGeminiTranslator_input-container {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
+    color: #7a7a7a;
 }
 
-input[type="password"],
-textarea,
-select {
+.aiGeminiTranslator_container input[type="password"],
+.aiGeminiTranslator_container textarea,
+.aiGeminiTranslator_container select {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 16px;
+    padding: 0.3rem;
+    margin-bottom: 0.3rem;
     border: 1px solid #424242;
     border-radius: 4px;
     background-color: #333333;
-    color: #e0e0e0;
+    color: #7a7a7a;
     box-sizing: border-box;
     font-size: 1rem;
     transition: border-color 0.3s ease;
 }
 
-input[type="password"]:focus,
-textarea:focus,
-select:focus {
+.aiGeminiTranslator_container input[type="password"]:focus,
+.aiGeminiTranslator_container textarea:focus,
+.aiGeminiTranslator_container select:focus {
     border-color: #bb86fc;
     outline: none;
 }
 
-textarea {
+.aiGeminiTranslator_container textarea {
     height: 130px;
     resize: vertical;
+    font-size: .8rem;
+}
+.aiGeminiTranslator_container textarea::placeholder {
+    color: #bb86fc;
+    opacity: 0.3;
 }
 
 #aiGeminiTranslator_translated-text {
    margin-bottom: 0;
 }
 
-select {
+.aiGeminiTranslator_container select {
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e0e0e0'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 16px;
-    margin-bottom: 0;
+    font-size: .8rem;
     margin-right: 10px;
+    margin-bottom: 0;;
 }
 
-button {
+#aiGeminiTranslator_translate-text-button, 
+#aiGeminiTranslator_save-api-key-button {
     background-color: #bb86fc;
-    color: #1e1e1e;
-    padding: 12px 16px;
+    color: #e0e0e0;
+    padding: .3rem;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 1rem;
     transition: background-color 0.3s ease;
 }
 
@@ -194,7 +198,7 @@ button:active {
     top: 0;
     bottom: 0;
     right: 10px;
-    transform: translateY(-50%);
+    transform: translateY(-40%);
     width: 16px;
     margin: auto;
     height: 16px;

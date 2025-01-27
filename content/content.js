@@ -11,7 +11,8 @@ document.addEventListener('mouseup', async (event) => {
     setTimeout(async () => {
         // Check if selection is within an input element
         const activeElement = document.activeElement;
-        const isInput = activeElement.tagName === 'INPUT';
+        const isInput = activeElement.tagName === 'INPUT' || 
+        activeElement.tagName === 'TEXTAREA';
         
         if (isInput) {
             hideIcon();

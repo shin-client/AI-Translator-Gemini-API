@@ -1,222 +1,164 @@
 import config from '../background/config.js';
+import translationRequest from '../background/translationRequest.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const API_URL = config.API_URL;
     let apiKey = '';
+    const elements = {
+        apiKeyInput: document.getElementById('aiGeminiTranslator_api-key-input'),
+        saveApiKeyButton: document.getElementById('aiGeminiTranslator_save-api-key-button'),
+        textToTranslateTextarea: document.getElementById('aiGeminiTranslator_text-to-translate'),
+        translatedTextTextarea: document.getElementById('aiGeminiTranslator_translated-text'),
+        textTargetLanguageSelect: document.getElementById('aiGeminiTranslator_text-target-language'),
+        translateTextButton: document.getElementById('aiGeminiTranslator_translate-text-button'),
+        apiKeyStatus: document.getElementById('aiGeminiTranslator_api-key-status'),
+        textTranslationStatus: document.getElementById('aiGeminiTranslator_text-translation-status'),
+        apiKeyCard: document.getElementById('aiGeminiTranslator_api-key-card'),
+        apiKeyCollapseButton: document.querySelector('.aiGeminiTranslator_collapse-button'),
+        apiKeyStatusIcon: document.querySelector('.aiGeminiTranslator_api-key-status-icon'),
+        apiKeyClearIcon: document.querySelector('.aiGeminiTranslator_api-key-clear-icon')
+    };
 
-    const apiKeyInput = document.getElementById('aiGeminiTranslator_api-key-input');
-    const saveApiKeyButton = document.getElementById('aiGeminiTranslator_save-api-key-button');
-    const textToTranslateTextarea = document.getElementById('aiGeminiTranslator_text-to-translate');
-    const translatedTextTextarea = document.getElementById('aiGeminiTranslator_translated-text');
-    const textTargetLanguageSelect = document.getElementById('aiGeminiTranslator_text-target-language');
-    const translateTextButton = document.getElementById('aiGeminiTranslator_translate-text-button');
-    const apiKeyStatus = document.getElementById('aiGeminiTranslator_api-key-status');
-    const textTranslationStatus = document.getElementById('aiGeminiTranslator_text-translation-status');
-    const apiKeyCard = document.getElementById('aiGeminiTranslator_api-key-card');
-    const apiKeyCollapseButton = apiKeyCard.querySelector('.aiGeminiTranslator_collapse-button');
-    const apiKeyStatusIcon = apiKeyCard.querySelector('.aiGeminiTranslator_api-key-status-icon');
-    const apiKeyClearIcon = apiKeyCard.querySelector('.aiGeminiTranslator_api-key-clear-icon');
-
-    // Load saved API key and target language
     const { geminiApiKey, textTargetLanguage } = await chrome.storage.local.get(['geminiApiKey', 'textTargetLanguage']);
     if (geminiApiKey) {
         apiKey = geminiApiKey;
-        apiKeyInput.value = geminiApiKey;
-        apiKeyClearIcon.classList.add('active');
-        apiKeyStatusIcon.classList.add('valid');
-    } else {
-        apiKeyStatusIcon.classList.add('invalid');
+        elements.apiKeyInput.value = geminiApiKey;
+        elements.apiKeyClearIcon.classList.add('active', 'valid');
     }
 
-    // Load default target language for text translation
-    if (textTargetLanguage) {
-        textTargetLanguageSelect.value = textTargetLanguage;
-    } else {
-        textTargetLanguageSelect.value = config.DEFAULT_TARGET_LANGUAGE;
-    }
+    elements.textTargetLanguageSelect.value = textTargetLanguage || config.DEFAULT_TARGET_LANGUAGE;
 
-    apiKeyCollapseButton.addEventListener('click', () => {
-        apiKeyCard.classList.toggle('collapsed');
+    elements.apiKeyCollapseButton.addEventListener('click', () => elements.apiKeyCard.classList.toggle('collapsed'));
+    elements.apiKeyInput.addEventListener('input', () => {
+        elements.apiKeyClearIcon.classList.toggle('active', !!elements.apiKeyInput.value.trim());
+        elements.apiKeyStatusIcon.classList.toggle('active', true);
     });
-
-    apiKeyInput.addEventListener('input', () => {
-        if (apiKeyInput.value.trim()) {
-            apiKeyClearIcon.classList.add('active');
-        } else {
-            apiKeyClearIcon.classList.remove('active');
-        }
-    });
-
-    apiKeyClearIcon.addEventListener('click', async () => {
-        apiKeyInput.value = '';
-        apiKeyClearIcon.classList.remove('active');
-        apiKeyStatusIcon.classList.remove('valid');
+    
+    elements.apiKeyClearIcon.addEventListener('click', async () => {
+        elements.apiKeyInput.value = '';
+        elements.apiKeyClearIcon.classList.remove('active');
         await chrome.storage.local.remove('geminiApiKey');
     });
 
-    saveApiKeyButton.addEventListener('click', async () => {
-        const newApiKey = apiKeyInput.value.trim();
+    elements.saveApiKeyButton.addEventListener('click', async () => {
+        const newApiKey = elements.apiKeyInput.value.trim();
+        if (!newApiKey) return updateStatus('API_KEY_EMPTY_MESSAGE', 'red', 'invalid');
         
-        if (!/^[A-Za-z0-9-_]{39}$/.test(newApiKey)) {
-            apiKeyStatus.textContent = config.API_KEY_INVALID_FORMAT_MESSAGE;
-            apiKeyStatus.style.color = 'red';
-            apiKeyStatus.classList.add('active');
-            return;
-        }
-
-        if (!newApiKey) {
-            apiKeyStatus.textContent = config.API_KEY_EMPTY_MESSAGE;
-            apiKeyStatus.classList.add('active');
-            apiKeyStatus.style.color = 'red';
-            apiKeyStatusIcon.classList.remove('valid');
-            apiKeyStatusIcon.classList.add('invalid');
-            return;
-        }
-
-        apiKeyStatus.textContent = config.API_KEY_VALIDATION_MESSAGE;
-        apiKeyStatus.classList.add('active');
-        apiKeyStatus.style.color = 'orange';
-        apiKeyStatusIcon.classList.remove('valid');
-        apiKeyStatusIcon.classList.remove('invalid');
-
+        updateStatus('API_KEY_VALIDATION_MESSAGE', 'orange');
+        
         try {
             const response = await fetch(`${API_URL}?key=${newApiKey}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(config.TEST_MESSAGE_REQUEST_BODY)
             });
 
-            if (!response.ok) {
-                apiKeyStatus.textContent = config.API_KEY_INVALID_MESSAGE;
-                apiKeyStatus.style.color = 'red';
-                apiKeyStatus.classList.add('active');
-                apiKeyStatusIcon.classList.remove('valid');
-                apiKeyStatusIcon.classList.add('invalid');
-                return;
+            const data = await response.json();
+            if (!response.ok || !data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toLowerCase().includes('test')) {
+                return updateStatus('API_KEY_INVALID_MESSAGE', 'red', 'invalid');
             }
 
-            apiKeyStatus.textContent = config.API_KEY_VALID_MESSAGE;
-            apiKeyStatus.style.color = 'green';
-            apiKeyStatus.classList.add('active');
-            apiKeyStatusIcon.classList.remove('invalid');
-            apiKeyStatusIcon.classList.add('valid');
-            apiKeyClearIcon.classList.add('active');
+            updateStatus('API_KEY_VALID_MESSAGE', 'green', 'valid');
             await chrome.storage.local.set({ geminiApiKey: newApiKey });
-            setTimeout(() => {
-                apiKeyStatus.textContent = '';
-                apiKeyStatus.classList.remove('active');
-            }, 3000);
+            apiKey = newApiKey;
+            elements.apiKeyInput.value = newApiKey;
+            elements.apiKeyClearIcon.classList.add('active');
         } catch (error) {
-            apiKeyStatus.textContent = `Error: ${error.message}`;
-            apiKeyStatus.style.color = 'red';
-            apiKeyStatus.classList.add('active');
-            apiKeyStatusIcon.classList.remove('valid');
-            apiKeyStatusIcon.classList.add('invalid');
+            updateStatus(`Error: ${error.message}`, 'red', 'invalid');
         }
     });
 
-    translateTextButton.addEventListener('click', async () => {
-        await translateText();
+    elements.translateTextButton.addEventListener('click', translateText);
+    elements.textTargetLanguageSelect.addEventListener('change', async () => {
+        await chrome.storage.local.set({ textTargetLanguage: elements.textTargetLanguageSelect.value });
     });
 
-    // Listen for changes in chrome.storage.local
     chrome.storage.onChanged.addListener((changes, areaName) => {
-        if (areaName === 'local' && changes.geminiApiKey) {
-            apiKey = changes.geminiApiKey.newValue || '';
-            apiKeyInput.value = apiKey;
-            if (apiKey) {
-                apiKeyStatusIcon.classList.remove('invalid');
-                apiKeyStatusIcon.classList.add('valid');
-                apiKeyClearIcon.classList.add('active');
-            } else {
-                apiKeyStatusIcon.classList.remove('valid');
-                apiKeyStatusIcon.classList.add('invalid');
-                apiKeyClearIcon.classList.remove('active');
+        if (areaName === 'local') {
+            if (changes.geminiApiKey) {
+                elements.apiKeyInput.value = changes.geminiApiKey.newValue || '';
+                elements.apiKeyClearIcon.classList.toggle('active', !!changes.geminiApiKey.newValue);
             }
-        }
-        if (areaName === 'local' && changes.textTargetLanguage) {
-            textTargetLanguageSelect.value = changes.textTargetLanguage.newValue;
+            if (changes.textTargetLanguage) elements.textTargetLanguageSelect.value = changes.textTargetLanguage.newValue;
         }
     });
 
-    textTargetLanguageSelect.addEventListener('change', async () => {
-        const targetLanguage = textTargetLanguageSelect.value;
-        await chrome.storage.local.set({ textTargetLanguage: targetLanguage });
-    });
-
-    textToTranslateTextarea.addEventListener('keydown', async (event) => {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            await translateText();
-        }
-    });
+    function updateStatus(messageKey, color, iconType) {
+        elements.apiKeyStatus.textContent = config[messageKey];
+        elements.apiKeyStatus.style.color = color;
+        elements.apiKeyStatusIcon.classList.toggle('valid', iconType === 'valid');
+        elements.apiKeyStatusIcon.classList.toggle('invalid', iconType === 'invalid');
+    }
 
     async function translateText() {
-        if (!apiKey) {
-            textTranslationStatus.textContent = config.API_KEY_NOT_SET_MESSAGE;
-            textTranslationStatus.style.color = 'red';
-            textTranslationStatus.classList.add('active');
-            return;
-        }
+        if (!apiKey) return updateTranslationStatus('API_KEY_NOT_SET_MESSAGE', 'red');
+        
+        const text = elements.textToTranslateTextarea.value.trim();
+        const targetLanguage = elements.textTargetLanguageSelect.value;
+        await chrome.storage.local.set({ textTargetLanguage });
 
-        const text = textToTranslateTextarea.value.trim();
-        const targetLanguage = textTargetLanguageSelect.value;
-        await chrome.storage.local.set({ textTargetLanguage: targetLanguage });
+        if (!text) return updateTranslationStatus('TEXT_TO_TRANSLATE_EMPTY_MESSAGE', 'red');
 
-        if (!text) {
-            translatedTextTextarea.value = '';
-            textTranslationStatus.textContent = config.TEXT_TO_TRANSLATE_EMPTY_MESSAGE;
-            textTranslationStatus.style.color = 'red';
-            textTranslationStatus.classList.add('active');
-            return;
-        }
-
-        textTranslationStatus.textContent = config.TRANSLATION_IN_PROGRESS_MESSAGE;
-        textTranslationStatus.style.color = 'yellow';
-        textTranslationStatus.classList.add('active');
-        translatedTextTextarea.value = '';
+        updateTranslationStatus('TRANSLATION_IN_PROGRESS_MESSAGE', 'yellow');
+        elements.translatedTextTextarea.value = '';
 
         try {
             const response = await fetch(`${API_URL}?key=${apiKey}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(config.TRANSLATION_REQUEST_BODY(text, targetLanguage))
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(translationRequest(text, targetLanguage))
             });
 
-            if (!response.ok) {
-                textTranslationStatus.textContent = config.TRANSLATION_FAILED_MESSAGE;
-                textTranslationStatus.style.color = 'red';
-                textTranslationStatus.classList.add('active');
-                return;
-            }
-
+            if (!response.ok) return updateTranslationStatus('TRANSLATION_FAILED_MESSAGE', 'red');
+            
             const data = await response.json();
-             if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-                const translatedText = data.candidates[0].content.parts[0].text
-                    .replace(/^["']|["']$/g, '') // Usuń cudzysłowy
-                    .replace(/^Translate to.*?: /i, ''); // Usuń prefiks "Translate to X:"
-                translatedTextTextarea.value = translatedText;
-                textTranslationStatus.textContent = config.TRANSLATION_COMPLETE_MESSAGE;
-                textTranslationStatus.style.color = 'green';
-                textTranslationStatus.classList.add('active');
-                setTimeout(() => {
-                    textTranslationStatus.textContent = '';
-                    textTranslationStatus.classList.remove('active');
-                }, 3000);
+            if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                elements.translatedTextTextarea.value = data.candidates[0].content.parts[0].text
+                    .replace(/^["']|["']$/g, '')
+                    .replace(/^Translate to.*?: /i, '');
+                updateTranslationStatus('TRANSLATION_COMPLETE_MESSAGE', 'green');
             } else {
-                textTranslationStatus.textContent = config.TRANSLATION_FAILED_MESSAGE;
-                textTranslationStatus.style.color = 'red';
-                textTranslationStatus.classList.add('active');
+                updateTranslationStatus('TRANSLATION_FAILED_MESSAGE', 'red');
             }
         } catch (error) {
-            console.error("Error during text translation:", error);
-            textTranslationStatus.textContent = `Text translation failed: ${error.message}`;
-            textTranslationStatus.style.color = 'red';
-            textTranslationStatus.classList.add('active');
+            updateTranslationStatus('TRANSLATION_FAILED_MESSAGE', 'red');
         }
     }
+
+    function updateTranslationStatus(messageKey, color) {
+        elements.textTranslationStatus.textContent = config[messageKey];
+        elements.textTranslationStatus.style.color = color;
+        elements.textTranslationStatus.classList.add('active');
+        if (color === 'green') setTimeout(() => elements.textTranslationStatus.classList.remove('active'), 3000);
+    }
+
+    elements.textToTranslateTextarea.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            translateText();
+        }
+    });
+
+    const textElements = {
+        'aiGeminiTranslator_select-label': 'TEXT_TO_TRANSLATE_LABEL',
+        'aiGeminiTranslator_translate-text-button': 'TRANSLATE_TEXT_BUTTON_TEXT',
+        'aiGeminiTranslator_save-api-key-button': 'SAVE_API_KEY_BUTTON_TEXT',
+        'aiGeminiTranslator_text-to-translate': 'TEXT_TO_TRANSLATE_PLACEHOLDER',
+        'aiGeminiTranslator_translated-text': 'TRANSLATED_TEXT_PLACEHOLDER',
+        'aiGeminiTranslator_text-translation-status': 'TEXT_TRANSLATION_STATUS_MESSAGE',
+        'aiGeminiTranslator_api-key-input': 'API_KEY_PLACEHOLDER',
+        'aiGeminiTranslator_translation-card-header-title': 'TRANSLATION_CARD_HEADER_TITLE',
+        'aiGeminiTranslator_api-key-card-header-title': 'API_KEY_CARD_HEADER_TITLE'
+    };
+
+    Object.entries(textElements).forEach(([id, key]) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        
+        if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+            element.placeholder = config[key];
+        } else {
+            element.textContent = config[key];
+        }
+    });
 }); 
