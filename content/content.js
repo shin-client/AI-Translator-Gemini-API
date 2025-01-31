@@ -3,13 +3,20 @@ let dialogBox;
 let selectedText;
 let targetLanguage;
 let isScriptActive = true;
+let isTranslationInProgress = false;
 
 // Handle text selection
 document.addEventListener('mouseup', async (event) => {
     if (!isScriptActive) return;
 
     setTimeout(async () => {
-        // Check if selection is within an input element
+        // Sprawdź czy zaznaczenie jest w okienku dialogowym
+        const selection = window.getSelection();
+        if (dialogBox && dialogBox.contains(selection.anchorNode)) {
+            return;
+        }
+
+        // Reszta istniejącej logiki
         const activeElement = document.activeElement;
         const isInput = activeElement.tagName === 'INPUT' || 
         activeElement.tagName === 'TEXTAREA';
@@ -18,13 +25,12 @@ document.addEventListener('mouseup', async (event) => {
             hideIcon();
             return;
         }
-
-        selectedText = window.getSelection().toString().trim();
+        
+        selectedText = selection.toString().trim();
         if (selectedText) {
-            const selection = window.getSelection();
             if (selection && selection.rangeCount > 0) {
-                const { textTargetLanguage } = await chrome.storage.local.get(['textTargetLanguage']);
-                targetLanguage = textTargetLanguage || 'English';
+                const { selectedTextLanguage } = await chrome.storage.local.get(['selectedTextLanguage']);
+                targetLanguage = selectedTextLanguage || 'English';
                 showTranslationIcon(event);
             }
         }
@@ -51,26 +57,20 @@ function showTranslationIcon(event) {
         document.body.appendChild(icon);
     }
 
-    const iconSize = 28; // 20px icon + 8px padding
-    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const iconRect = icon.getBoundingClientRect();
+    const viewportWidth = document.documentElement.clientWidth;
+    const viewportHeight = document.documentElement.clientHeight;
     
-    // Use mouse position for icon placement
-    let left = event.pageX + 5;
-    let top = event.pageY - (iconSize / 2);
+    // Nowe obliczenia pozycji uwzględniające scroll
+    let posX = event.clientX + window.scrollX;
+    let posY = event.clientY + window.scrollY;
+    
+    // Dopasowanie pozycji do widocznego obszaru
+    posX = Math.min(posX + 10, viewportWidth + window.scrollX - iconRect.width);
+    posY = Math.min(posY - iconRect.height/2, viewportHeight + window.scrollY - iconRect.height);
 
-    // Adjust position if icon would be outside viewport
-    if (left + iconSize > viewportWidth + window.pageXOffset) {
-        left = event.pageX - iconSize - 5;
-    }
-    if (top < window.pageYOffset) {
-        top = window.pageYOffset;
-    } else if (top + iconSize > viewportHeight + window.pageYOffset) {
-        top = window.pageYOffset + viewportHeight - iconSize;
-    }
-
-    icon.style.left = `${left}px`;
-    icon.style.top = `${top}px`;
+    icon.style.left = `${posX}px`;
+    icon.style.top = `${posY}px`;
     icon.style.display = 'block';
 }
 
@@ -81,26 +81,31 @@ function hideIcon() {
 }
 
 async function translateSelectedText() {
-    if (!selectedText) return;
-
-    // Show loading state
+    if (!selectedText || isTranslationInProgress) return;
+    
+    isTranslationInProgress = true;
     const originalIcon = icon.innerHTML;
     icon.innerHTML = '<div class="aiGeminiTranslator_loadingGeminiTranslation"></div>';
-    icon.style.padding = '8px';
+    icon.style.pursor = 'wait';
 
     chrome.runtime.sendMessage({
         action: 'translateSelectedText',
         text: selectedText,
         targetLanguage: targetLanguage
     }, (response) => {
-        if (response && response.translatedText) {
-            hideIcon(); // Hide icon after successful translation
+        isTranslationInProgress = false;
+        if (chrome.runtime.lastError) {
+            showDialogBox(config.TRANSLATION_FAILED_MESSAGE);
+            return;
+        }
+        
+        if (response?.translatedText) {
+            hideIcon();
             showDialogBox(response.translatedText);
         } else {
-            // Restore icon if translation failed
             icon.innerHTML = originalIcon;
             icon.style.padding = '4px';
-            showDialogBox(('translationFailed'));
+            showDialogBox(response?.error || config.TRANSLATION_FAILED_MESSAGE);
         }
     });
 }
@@ -127,7 +132,15 @@ function showDialogBox(translatedText) {
     content.className = 'aiGeminiTranslator_translation-content';
     content.textContent = translatedText;
 
+    const isError = translatedText.includes('Failed') || translatedText.includes('Invalid');
+    
+    if (isError) {
+        dialogBox.classList.add('error');
+        content.classList.add('error');
+    }
+
     dialogBox.appendChild(content);
+
     document.body.appendChild(dialogBox);
 
     // Adjust position if dialog would go outside viewport
@@ -151,3 +164,19 @@ function removeDialogBox() {
         selectedText = null;
     }
 }
+
+const createDOMElement = (type, classes, attributes) => {
+    const el = document.createElement(type);
+    if (classes) el.className = classes;
+    if (attributes) {
+        Object.entries(attributes).forEach(([key, value]) => {
+            el.setAttribute(key, value);
+        });
+    }
+    return el;
+};
+
+// Przykład użycia:
+const createIcon = () => createDOMElement('div', 'translation-icon', {
+    'data-role': 'translate-icon'
+});

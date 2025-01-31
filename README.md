@@ -46,8 +46,7 @@ This Chrome extension allows you to quickly translate selected text on any webpa
     - A translation icon will appear near the selected text.
     - Click the translation icon to translate the text.
     - A dialog box will appear with the translated text.
-    - Click the "X" button in the dialog box to close it or click outside the dialog box to close it.
-4.  You can change the target language in the popup.
+    - You can change the target language in the popup settings.
 
 ## 📸 Screenshots (Popup and Select-translation)
 
@@ -82,3 +81,16 @@ Contributions are welcome! Please feel free to submit a pull request.
 - Changed translation request body
 - Added config file
 - Added prefix to all classes and IDs
+
+### v1.2.0
+- Added separate language selection for selected text translations
+- Improved UI consistency across all components
+- Added error handling for empty translation requests
+- Implemented visual feedback for copy operations
+- Fixed position calculation for translation dialog
+- Removed close button from translation dialog
+- Added prevention for translation icon appearing in dialog content
+- Centralized all text strings in configuration file
+- Optimized CSS transitions and animations
+- Enhanced API key validation process
+

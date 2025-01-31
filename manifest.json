@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AI Translator Gemini API",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "AI translator extension using Google Gemini API",
   "minimum_chrome_version": "88",
   "permissions": [
