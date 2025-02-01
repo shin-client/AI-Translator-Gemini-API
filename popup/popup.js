@@ -17,9 +17,11 @@ const textElements = {
     'aiGeminiTranslator_copy-icon': 'COPY_ICON_TOOLTIP'
 };
 
+const systemLanguage = chrome.i18n.getUILanguage().split('-')[0];
+
 document.addEventListener('DOMContentLoaded', async () => {
     // Get API URL from config
-    const API_URL = config.API_URL;
+    const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
     let apiKey = '';
 
     // Get DOM elements
@@ -48,9 +50,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!element) return;
 
         if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
-            element.placeholder = config[key];
+            element.placeholder = chrome.i18n.getMessage(key);
         } else {
-            element.textContent = config[key];
+            element.textContent = chrome.i18n.getMessage(key);
         }
     });
 
@@ -61,10 +63,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         elements.apiKeyInput.value = geminiApiKey;
         elements.apiKeyClearIcon.classList.add('active');
         elements.apiKeyStatusIcon.classList.add('valid');
-        elements.apiStatusTooltip.textContent = config.API_STATUS_VALID_TOOLTIP;
+        elements.apiStatusTooltip.textContent = chrome.i18n.getMessage('API_STATUS_VALID_TOOLTIP');
         elements.apiStatusTooltip.style.color = '#4CAF50';
     } else {
-        elements.apiStatusTooltip.textContent = config.API_STATUS_INVALID_TOOLTIP;
+        elements.apiStatusTooltip.textContent = chrome.i18n.getMessage('API_STATUS_INVALID_TOOLTIP');
         elements.apiStatusTooltip.style.color = '#F44336';
     }
 
@@ -135,31 +137,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         const textToCopy = elements.translatedTextTextarea.value;
         
         if (!textToCopy) {
-            showCopyStatus(config.COPY_NO_TEXT_MESSAGE, 'var(--copy-error-color)');
+            showCopyStatus(chrome.i18n.getMessage('COPY_NO_TEXT_MESSAGE'), 'var(--copy-error-color)');
             return;
         }
         
         try {
             await navigator.clipboard.writeText(textToCopy);
-            showCopyStatus(config.COPY_SUCCESS_MESSAGE, 'var(--text-color)');
+            showCopyStatus(chrome.i18n.getMessage('COPY_SUCCESS_MESSAGE'), 'var(--text-color)');
         } catch (err) {
             console.error('Failed to copy text:', err);
-            showCopyStatus(config.COPY_FAILED_MESSAGE, 'var(--copy-error-color)');
+            showCopyStatus(chrome.i18n.getMessage('COPY_FAILED_MESSAGE'), 'var(--copy-error-color)');
         }
     });
 
-    elements.copyIcon.title = config.COPY_ICON_TOOLTIP;
+    elements.copyIcon.title = chrome.i18n.getMessage('COPY_ICON_TOOLTIP');
 
     elements.selectedTextLanguageSelect.addEventListener('change', async () => {
         const newValue = elements.selectedTextLanguageSelect.value;
         await chrome.storage.local.set({ selectedTextLanguage: newValue });
         
         // Zaktualizuj widok selecta
-        initializeSelect(
-            elements.selectedTextLanguageSelect, 
-            config.LANGUAGES, 
-            newValue
-        );
+        initializeSelects();
     });
 
     chrome.storage.onChanged.addListener((changes, areaName) => {
@@ -185,7 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let translationStatusTimeoutId = null;
 
     function updateStatus(messageKey, color) {
-        elements.apiKeyStatus.textContent = config[messageKey];
+        elements.apiKeyStatus.textContent = chrome.i18n.getMessage(messageKey);
         elements.apiKeyStatus.style.color = color;
         
         if (color === 'green') {
@@ -208,8 +206,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Aktualizuj treść i kolor tooltipa
         const hasValidApiKey = color === 'green';
         elements.apiStatusTooltip.textContent = hasValidApiKey 
-            ? config.API_STATUS_VALID_TOOLTIP 
-            : config.API_STATUS_INVALID_TOOLTIP;
+            ? chrome.i18n.getMessage('API_STATUS_VALID_TOOLTIP') 
+            : chrome.i18n.getMessage('API_STATUS_INVALID_TOOLTIP');
         elements.apiStatusTooltip.style.color = hasValidApiKey ? '#4CAF50' : '#F44336';
         
         // Aktualizuj klasę ikony statusu
@@ -218,7 +216,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function updateTranslationStatus(messageKey, color) {
-        elements.textTranslationStatus.textContent = config[messageKey];
+        elements.textTranslationStatus.textContent = chrome.i18n.getMessage(messageKey);
         elements.textTranslationStatus.style.color = color;
         elements.textTranslationStatus.style.display = 'block';
         
@@ -249,7 +247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error("API Error:", errorData);
-                return updateTranslationStatus(`${config.TRANSLATION_FAILED_MESSAGE}: ${errorData.error?.message || 'Unknown error'}`, 'red');
+                return updateTranslationStatus(`${chrome.i18n.getMessage('TRANSLATION_FAILED_MESSAGE')}: ${errorData.error?.message || 'Unknown error'}`, 'red');
             }
 
             const data = await response.json();
@@ -262,8 +260,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 updateTranslationStatus('TRANSLATION_FAILED_MESSAGE', 'red');
             }
         } catch (error) {
-            console.error("Error during text translation:", error);
-            updateTranslationStatus(`${config.TRANSLATION_FAILED_MESSAGE}: ${error.message}`, 'red');
+            handleError(error, 'translateText');
         }
     }
 
@@ -283,6 +280,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Dodaj nową funkcję statusu kopiowania
     function showCopyStatus(message, color) {
         const tooltip = document.querySelector('.aiGeminiTranslator_copy-tooltip');
+        if (!tooltip) {
+            console.error("Tooltip element not found!");
+            return;
+        }
         tooltip.textContent = message;
         tooltip.style.color = color;
         tooltip.classList.add('visible');
@@ -292,37 +293,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 2000);
     }
 
-    // Zmodyfikuj funkcję initializeSelect
-    const initializeSelect = (selectElement, languages, selectedValue) => {
-        selectElement.innerHTML = languages.map(lang => 
-            `<option value="${lang.value}" ${lang.value === selectedValue ? 'selected' : ''}>${lang.label}</option>`
-        ).join('');
-    };
+    // Uproszczona inicjalizacja
+    const initializeSelects = async () => {
+        const { 
+            textTargetLanguage = systemLanguage,
+            selectedTextLanguage = systemLanguage 
+        } = await chrome.storage.local.get(['textTargetLanguage', 'selectedTextLanguage']);
 
-    const initializeAllSelects = async () => {
-        const { textTargetLanguage, selectedTextLanguage } = await chrome.storage.local.get([
-            'textTargetLanguage', 
-            'selectedTextLanguage'
-        ]);
-        
-        const selectsConfig = [
-            {
-                element: elements.textTargetLanguageSelect,
-                defaultValue: textTargetLanguage || config.DEFAULT_TARGET_LANGUAGE
-            },
-            {
-                element: elements.selectedTextLanguageSelect,
-                defaultValue: selectedTextLanguage || 'English'
-            }
-        ];
-        
-        selectsConfig.forEach(({ element, defaultValue }) => {
-            initializeSelect(element, config.LANGUAGES, defaultValue);
+        [elements.textTargetLanguageSelect, elements.selectedTextLanguageSelect].forEach((select, index) => {
+            select.innerHTML = config.LANGUAGES.map(lang => 
+                `<option value="${lang.value}" ${lang.value === (index ? selectedTextLanguage : textTargetLanguage) ? 'selected' : ''}>
+                    ${lang.label}
+                </option>`
+            ).join('');
         });
     };
 
     // Wywołanie w DOMContentLoaded
-    await initializeAllSelects();
+    await initializeSelects();
 
     const setupEventListeners = () => {
         const handlers = {
@@ -337,19 +325,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    const showStatus = (message, type = 'info') => {
-        const colors = {
-            error: '#ff4444',
-            success: '#4CAF50',
-            info: '#bb86fc'
-        };
+    function updateLanguageSwitcher() {
+        const langSelect = document.getElementById('language-switcher');
+        langSelect.innerHTML = Object.keys(chrome.i18n.getAcceptLanguages())
+            .map(lang => `<option value="${lang}">${lang}</option>`)
+            .join('');
         
-        elements.statusElement.textContent = message;
-        elements.statusElement.style.color = colors[type];
-        elements.statusElement.style.display = 'block';
-        
-        setTimeout(() => {
-            elements.statusElement.style.display = 'none';
-        }, 3000);
-    };
+        langSelect.addEventListener('change', () => {
+            chrome.storage.local.set({ preferredLanguage: langSelect.value });
+            window.location.reload();
+        });
+    }
 }); 

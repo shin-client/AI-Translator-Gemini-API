@@ -1,0 +1,118 @@
+{
+  "extension_name": {
+    "message": "Tradutor AI Gemini API",
+    "description": "Extension name"
+  },
+  "extension_description": {
+    "message": "Extensão de tradução AI usando Google Gemini API",
+    "description": "Extension description"
+  },
+  "translate_button": {
+    "message": "Traduzir",
+    "description": "Translate button text"
+  },
+  "api_key_placeholder": {
+    "message": "Insira sua chave API Gemini",
+    "description": "API key input placeholder"
+  },
+  "translation_failed": {
+    "message": "Falha na tradução",
+    "description": "Translation error message"
+  },
+  "copy_success": {
+    "message": "Texto copiado!",
+    "description": "Copy success message"
+  },
+  "language_en": {
+    "message": "Inglês",
+    "description": "English language label"
+  },
+  "language_pl": {
+    "message": "Polonês",
+    "description": "Polish language label"
+  },
+  "API_KEY_VALIDATION_MESSAGE": {
+    "message": "Validando chave API...",
+    "description": "API key validation in progress"
+  },
+  "API_KEY_VALID_MESSAGE": {
+    "message": "Chave API válida",
+    "description": "API key validation success"
+  },
+  "API_KEY_INVALID_MESSAGE": {
+    "message": "Chave API inválida",
+    "description": "API key validation failed"
+  },
+  "API_KEY_EMPTY_MESSAGE": {
+    "message": "A chave API não pode estar vazia",
+    "description": "Empty API key error"
+  },
+  "TRANSLATION_IN_PROGRESS_MESSAGE": {
+    "message": "Traduzindo texto...",
+    "description": "Translation in progress status"
+  },
+  "TRANSLATION_COMPLETE_MESSAGE": {
+    "message": "Tradução concluída",
+    "description": "Translation success status"
+  },
+  "API_KEY_NOT_SET_MESSAGE": {
+    "message": "Por favor defina sua chave API primeiro",
+    "description": "Missing API key error"
+  },
+  "TEXT_TO_TRANSLATE_EMPTY_MESSAGE": {
+    "message": "Por favor insira o texto para traduzir",
+    "description": "Empty input text error"
+  },
+  "TEXT_TO_TRANSLATE_LABEL": {
+    "message": "Idioma:",
+    "description": "Language selector label"
+  },
+  "SAVE_API_KEY_BUTTON_TEXT": {
+    "message": "Salvar chave API",
+    "description": "API key save button"
+  },
+  "TEXT_TO_TRANSLATE_PLACEHOLDER": {
+    "message": "Insira o texto para traduzir",
+    "description": "Input text placeholder"
+  },
+  "TRANSLATED_TEXT_PLACEHOLDER": {
+    "message": "Tradução",
+    "description": "Translation result placeholder"
+  },
+  "TEXT_TRANSLATION_STATUS_MESSAGE": {
+    "message": "Status da tradução de texto",
+    "description": "Translation status header"
+  },
+  "API_KEY_CARD_HEADER_TITLE": {
+    "message": "Chave API",
+    "description": "API key section header"
+  },
+  "SETTINGS_CARD_HEADER_TITLE": {
+    "message": "Configurações",
+    "description": "Settings section header"
+  },
+  "TRANSLATION_CARD_HEADER_TITLE": {
+    "message": "Tradução",
+    "description": "Translation section header"
+  },
+  "API_STATUS_VALID_TOOLTIP": {
+    "message": "Clique para copiar a chave API",
+    "description": "Tooltip for valid API key status"
+  },
+  "API_STATUS_INVALID_TOOLTIP": {
+    "message": "Clique para inserir nova chave API",
+    "description": "Tooltip for invalid API key status"
+  },
+  "SELECTED_TEXT_LANGUAGE_LABEL": {
+    "message": "Idioma de origem:",
+    "description": "Label for selected text language"
+  },
+  "API_KEY_LABEL": {
+    "message": "Chave API:",
+    "description": "Label for API key input"
+  },
+  "COPY_ICON_TOOLTIP": {
+    "message": "Copiar para área de transferência",
+    "description": "Tooltip for copy icon"
+  }
+} 

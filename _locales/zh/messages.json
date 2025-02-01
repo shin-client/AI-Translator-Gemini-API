@@ -1,0 +1,118 @@
+{
+  "extension_name": {
+    "message": "AI翻译器 Gemini API",
+    "description": "Extension name"
+  },
+  "extension_description": {
+    "message": "使用Google Gemini API的AI翻译扩展",
+    "description": "Extension description"
+  },
+  "translate_button": {
+    "message": "翻译",
+    "description": "Translate button text"
+  },
+  "api_key_placeholder": {
+    "message": "输入您的Gemini API密钥",
+    "description": "API key input placeholder"
+  },
+  "translation_failed": {
+    "message": "翻译失败",
+    "description": "Translation error message"
+  },
+  "copy_success": {
+    "message": "文本已复制！",
+    "description": "Copy success message"
+  },
+  "language_en": {
+    "message": "英语",
+    "description": "English language label"
+  },
+  "language_pl": {
+    "message": "波兰语",
+    "description": "Polish language label"
+  },
+  "API_KEY_VALIDATION_MESSAGE": {
+    "message": "正在验证API密钥...",
+    "description": "API key validation in progress"
+  },
+  "API_KEY_VALID_MESSAGE": {
+    "message": "API密钥有效",
+    "description": "API key validation success"
+  },
+  "API_KEY_INVALID_MESSAGE": {
+    "message": "API密钥无效",
+    "description": "API key validation failed"
+  },
+  "API_KEY_EMPTY_MESSAGE": {
+    "message": "API密钥不能为空",
+    "description": "Empty API key error"
+  },
+  "TRANSLATION_IN_PROGRESS_MESSAGE": {
+    "message": "正在翻译文本...",
+    "description": "Translation in progress status"
+  },
+  "TRANSLATION_COMPLETE_MESSAGE": {
+    "message": "翻译完成",
+    "description": "Translation success status"
+  },
+  "API_KEY_NOT_SET_MESSAGE": {
+    "message": "请先设置API密钥",
+    "description": "Missing API key error"
+  },
+  "TEXT_TO_TRANSLATE_EMPTY_MESSAGE": {
+    "message": "请输入要翻译的文本",
+    "description": "Empty input text error"
+  },
+  "TEXT_TO_TRANSLATE_LABEL": {
+    "message": "语言：",
+    "description": "Language selector label"
+  },
+  "SAVE_API_KEY_BUTTON_TEXT": {
+    "message": "保存API密钥",
+    "description": "API key save button"
+  },
+  "TEXT_TO_TRANSLATE_PLACEHOLDER": {
+    "message": "输入要翻译的文本",
+    "description": "Input text placeholder"
+  },
+  "TRANSLATED_TEXT_PLACEHOLDER": {
+    "message": "翻译结果",
+    "description": "Translation result placeholder"
+  },
+  "TEXT_TRANSLATION_STATUS_MESSAGE": {
+    "message": "文本翻译状态",
+    "description": "Translation status header"
+  },
+  "API_KEY_CARD_HEADER_TITLE": {
+    "message": "API密钥",
+    "description": "API key section header"
+  },
+  "SETTINGS_CARD_HEADER_TITLE": {
+    "message": "设置",
+    "description": "Settings section header"
+  },
+  "TRANSLATION_CARD_HEADER_TITLE": {
+    "message": "翻译",
+    "description": "Translation section header"
+  },
+  "API_STATUS_VALID_TOOLTIP": {
+    "message": "点击复制API密钥",
+    "description": "Tooltip for valid API key status"
+  },
+  "API_STATUS_INVALID_TOOLTIP": {
+    "message": "点击输入新API密钥",
+    "description": "Tooltip for invalid API key status"
+  },
+  "SELECTED_TEXT_LANGUAGE_LABEL": {
+    "message": "源语言：",
+    "description": "Label for selected text language"
+  },
+  "API_KEY_LABEL": {
+    "message": "API密钥：",
+    "description": "Label for API key input"
+  },
+  "COPY_ICON_TOOLTIP": {
+    "message": "复制到剪贴板",
+    "description": "Tooltip for copy icon"
+  }
+} 

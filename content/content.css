@@ -2,7 +2,7 @@
     position: absolute;
     cursor: pointer;
     z-index: 10000;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: #ffffff;
     border: 1px solid #ececec;
     border-radius: 50%;
     padding: 4px;
@@ -56,17 +56,13 @@
 }
 
 @keyframes aiGeminiTranslator_pulse {
-    0% {
-        transform: scale(0.5);
-        opacity: 0.5;
+    0%, 100% { 
+        transform: scale(0.8); 
+        opacity: 0.5; 
     }
-    50% {
-        transform: scale(1.05);
-        opacity: 0.8;
-    }
-    100% {
-        transform: scale(0.5);
-        opacity: 0.5;
+    50% { 
+        transform: scale(1.1); 
+        opacity: 1; 
     }
 }
 
@@ -85,10 +81,19 @@
     50% { transform: scale(1.1); opacity: 1; }
 }
 
-.loading-indicator {
-    animation: pulse 2s ease-in-out infinite;
-    width: 20px;
-    height: 20px;
-    border: 2px solid currentColor;
-    border-radius: 50%;
+/* Nowa animacja ładowania */
+@keyframes aiGeminiTranslator_skeleton {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.aiGeminiTranslator_loading-skeleton {
+    animation: aiGeminiTranslator_skeleton 1.5s infinite linear;
+    background: linear-gradient(
+        90deg,
+        rgba(255,255,255,0.1) 25%,
+        rgba(255,255,255,0.3) 50%,
+        rgba(255,255,255,0.1) 75%
+    );
+    background-size: 200% 100%;
 } 

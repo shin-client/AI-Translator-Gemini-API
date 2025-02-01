@@ -1,6 +1,12 @@
+const sanitizeInput = (text) => {
+    return text
+        .replace(/[<>]/g, '')
+        .substring(0, 5000);
+};
+
 const translationRequest = (text, targetLanguage) => ({
     contents: [{
-        parts: [{ text: `Translate to ${targetLanguage}:\n${text}` }]
+        parts: [{ text: `Translate to ${targetLanguage}:\n${sanitizeInput(text)}` }]
     }],
     generationConfig: {
         temperature: 0.3,

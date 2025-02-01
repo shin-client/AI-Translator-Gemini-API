@@ -52,7 +52,7 @@ function showTranslationIcon(event) {
     if (!icon) {
         icon = document.createElement('div');
         icon.className = 'aiGeminiTranslator_translation-selected-text-icon';
-        icon.innerHTML = `<img class="aiGeminiTranslator_translation-selected-text-icon-image" src="${chrome.runtime.getURL('images/icon48.png')}" alt="Translate">`;
+        icon.innerHTML = `<img class="aiGeminiTranslator_translation-selected-text-icon-image" src="${chrome.runtime.getURL('icons/icon48.png')}" alt="Translate">`;
         icon.addEventListener('click', translateSelectedText);
         document.body.appendChild(icon);
     }
@@ -72,6 +72,7 @@ function showTranslationIcon(event) {
     icon.style.left = `${posX}px`;
     icon.style.top = `${posY}px`;
     icon.style.display = 'block';
+    icon.title = chrome.i18n.getMessage('translate_button');
 }
 
 function hideIcon() {
@@ -95,7 +96,7 @@ async function translateSelectedText() {
     }, (response) => {
         isTranslationInProgress = false;
         if (chrome.runtime.lastError) {
-            showDialogBox(config.TRANSLATION_FAILED_MESSAGE);
+            showDialogBox(chrome.i18n.getMessage('TRANSLATION_FAILED_MESSAGE'));
             return;
         }
         
@@ -105,7 +106,7 @@ async function translateSelectedText() {
         } else {
             icon.innerHTML = originalIcon;
             icon.style.padding = '4px';
-            showDialogBox(response?.error || config.TRANSLATION_FAILED_MESSAGE);
+            showDialogBox(chrome.i18n.getMessage('TRANSLATION_FAILED_MESSAGE'));
         }
     });
 }
@@ -132,7 +133,7 @@ function showDialogBox(translatedText) {
     content.className = 'aiGeminiTranslator_translation-content';
     content.textContent = translatedText;
 
-    const isError = translatedText.includes('Failed') || translatedText.includes('Invalid');
+    const isError = translatedText.includes(chrome.i18n.getMessage('TRANSLATION_FAILED_MESSAGE'));
     
     if (isError) {
         dialogBox.classList.add('error');
@@ -176,7 +177,17 @@ const createDOMElement = (type, classes, attributes) => {
     return el;
 };
 
-// Przykład użycia:
-const createIcon = () => createDOMElement('div', 'translation-icon', {
-    'data-role': 'translate-icon'
-});
+// Uproszczona obsługa zdarzeń
+const handleKeyEvents = (e) => {
+    if (e.key === 'Escape' && dialogBox) {
+        removeDialogBox();
+        return;
+    }
+    
+    if (e.ctrlKey && e.key === 't' && selectedText) {
+        e.preventDefault();
+        translateSelectedText();
+    }
+};
+
+document.addEventListener('keydown', handleKeyEvents);
