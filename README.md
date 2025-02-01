@@ -74,32 +74,32 @@ Contributions are welcome! Please feel free to submit a pull request.
 
 ## 📝 Changelog
 
-### v1.4.0 - 2024-06-20
+### v1.4.0
 - **New:** Added 12 language translations (DE, FR, ES, IT, PT, RU, JA, KO, ZH, PL + EN)
 - **Feature:** Complete UI localization system with dynamic text replacement
 - **Security:** Implemented strict Content Security Policy (CSP) rules
 - **Improvement:** Restructured project architecture to Chrome Web Store standards
 - **Performance:** Optimized background service worker implementation
 
-### v1.3.0 - 2024-05-15
+### v1.3.0
 - Code cleanup and dependency optimization
 - Enhanced error handling mechanisms
 - Semantic HTML improvements
 - CSS animation consolidation
 - Status display warning fixes
 
-### v1.2.0 - 2024-04-20
+### v1.2.0
 - Separate language selection for text translations
 - UI consistency improvements  
 - Visual feedback for copy operations
 - Centralized text configuration
 - API key validation enhancements
 
-### v1.1.0 - 2024-03-10
+### v1.1.0
 - Translation request body updates
 - Configuration file added
 - CSS class prefixing
 
-### v1.0.0 - 2024-02-01
+### v1.0.0
 - Initial release
 
