@@ -17,6 +17,7 @@ Thumbs.db
 .idea
 *.suo
 *.code-workspace
+/docs/*
 
 # Temporary files
 *~

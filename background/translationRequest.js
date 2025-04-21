@@ -9,15 +9,15 @@ const translationRequest = (text, targetLanguage) => ({
         parts: [{ text: `Translate to ${targetLanguage}:\n${sanitizeInput(text)}` }]
     }],
     generationConfig: {
-        temperature: 0.3,
-        maxOutputTokens: 200,
+        temperature: 0.6,
+        maxOutputTokens: 2000,
         topP: 0.9
     },
     safetySettings: [
-        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
+        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
     ],
     systemInstruction: {
         parts: [{
