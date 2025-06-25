@@ -114,5 +114,105 @@
   "COPY_ICON_TOOLTIP": {
     "message": "Copiar para área de transferência",
     "description": "Tooltip for copy icon"
+  },
+  "language_de": {
+    "message": "Alemão",
+    "description": "German language label"
+  },
+  "language_es": {
+    "message": "Espanhol",
+    "description": "Spanish language label"
+  },
+  "language_fr": {
+    "message": "Francês",
+    "description": "French language label"
+  },
+  "language_it": {
+    "message": "Italiano",
+    "description": "Italian language label"
+  },
+  "language_pt": {
+    "message": "Português",
+    "description": "Portuguese language label"
+  },
+  "language_ru": {
+    "message": "Russo",
+    "description": "Russian language label"
+  },
+  "language_zh": {
+    "message": "Chinês",
+    "description": "Chinese language label"
+  },
+  "language_ja": {
+    "message": "Japonês",
+    "description": "Japanese language label"
+  },
+  "language_ko": {
+    "message": "Coreano",
+    "description": "Korean language label"
+  },
+  "language_uk": {
+    "message": "Ucraniano",
+    "description": "Ukrainian language label"
+  },
+  "TRANSLATE_TEXT_BUTTON_TEXT": {
+    "message": "Traduzir",
+    "description": "Translate button text"
+  },
+  "API_KEY_PLACEHOLDER": {
+    "message": "Insira sua chave API Gemini",
+    "description": "API key input placeholder"
+  },
+  "TRANSLATION_FAILED_MESSAGE": {
+    "message": "Falha na tradução",
+    "description": "General translation error"
+  },
+  "COPY_SUCCESS_MESSAGE": {
+    "message": "Texto copiado!",
+    "description": "Copy success message"
+  },
+  "COPY_NO_TEXT_MESSAGE": {
+    "message": "Nenhum texto para copiar",
+    "description": "No text to copy message"
+  },
+  "COPY_FAILED_MESSAGE": {
+    "message": "Falha ao copiar texto",
+    "description": "Copy failed message"
+  },
+  "HISTORY_CARD_HEADER_TITLE": {
+    "message": "Histórico",
+    "description": "History section header"
+  },
+  "HISTORY_RESTORE_BUTTON_TEXT": {
+    "message": "Restaurar",
+    "description": "Restore translation button"
+  },
+  "HISTORY_CLEAR_BUTTON_TEXT": {
+    "message": "Limpar histórico",
+    "description": "Clear history button"
+  },
+  "HISTORY_EMPTY_MESSAGE": {
+    "message": "Sem histórico de tradução",
+    "description": "Empty history message"
+  },
+  "HISTORY_DELETE_SELECTED_BUTTON_TEXT": {
+    "message": "Excluir selecionados",
+    "description": "Delete selected history items button"
+  },
+  "HISTORY_SELECT_ALL_BUTTON_TEXT": {
+    "message": "Selecionar tudo",
+    "description": "Select all history items button"
+  },
+  "HISTORY_DESELECT_ALL_BUTTON_TEXT": {
+    "message": "Desmarcar tudo",
+    "description": "Deselect all history items button"
+  },
+  "HISTORY_ITEM_SELECTED_TOOLTIP": {
+    "message": "Clique para desmarcar",
+    "description": "Tooltip for selected history item"
+  },
+  "HISTORY_ITEM_UNSELECTED_TOOLTIP": {
+    "message": "Clique para selecionar",
+    "description": "Tooltip for unselected history item"
   }
 } 

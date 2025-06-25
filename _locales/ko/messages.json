@@ -166,5 +166,41 @@
   "COPY_ICON_TOOLTIP": {
     "message": "클립보드에 복사",
     "description": "Tooltip for copy icon"
+  },
+  "HISTORY_CARD_HEADER_TITLE": {
+    "message": "기록",
+    "description": "History section header"
+  },
+  "HISTORY_RESTORE_BUTTON_TEXT": {
+    "message": "복원",
+    "description": "Restore translation button"
+  },
+  "HISTORY_CLEAR_BUTTON_TEXT": {
+    "message": "기록 삭제",
+    "description": "Clear history button"
+  },
+  "HISTORY_EMPTY_MESSAGE": {
+    "message": "번역 기록이 없습니다",
+    "description": "Empty history message"
+  },
+  "HISTORY_DELETE_SELECTED_BUTTON_TEXT": {
+    "message": "선택된 항목 삭제",
+    "description": "Delete selected history items button"
+  },
+  "HISTORY_SELECT_ALL_BUTTON_TEXT": {
+    "message": "모두 선택",
+    "description": "Select all history items button"
+  },
+  "HISTORY_DESELECT_ALL_BUTTON_TEXT": {
+    "message": "모두 선택 해제",
+    "description": "Deselect all history items button"
+  },
+  "HISTORY_ITEM_SELECTED_TOOLTIP": {
+    "message": "클릭하여 선택 해제",
+    "description": "Tooltip for selected history item"
+  },
+  "HISTORY_ITEM_UNSELECTED_TOOLTIP": {
+    "message": "클릭하여 선택",
+    "description": "Tooltip for unselected history item"
   }
 } 

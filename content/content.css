@@ -96,4 +96,55 @@
         rgba(255,255,255,0.1) 75%
     );
     background-size: 200% 100%;
+}
+
+/* Screenshot selector styles */
+.aiGeminiTranslator_screenshot-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(0, 0, 0, 0.3) !important;
+    z-index: 10000 !important;
+    cursor: crosshair !important;
+    pointer-events: auto !important;
+}
+
+.aiGeminiTranslator_selection-rect {
+    position: absolute !important;
+    border: 2px solid #4CAF50 !important;
+    background: rgba(76, 175, 80, 0.1) !important;
+    display: none !important;
+    pointer-events: none !important;
+}
+
+.aiGeminiTranslator_screenshot-instructions {
+    position: fixed !important;
+    top: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: #333 !important;
+    color: white !important;
+    padding: 10px 20px !important;
+    border-radius: 5px !important;
+    z-index: 10001 !important;
+    font-family: Arial, sans-serif !important;
+    font-size: 14px !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;
+}
+
+.aiGeminiTranslator_screenshot-loading {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: #333 !important;
+    color: white !important;
+    padding: 20px !important;
+    border-radius: 10px !important;
+    z-index: 10002 !important;
+    font-family: Arial, sans-serif !important;
+    text-align: center !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
 } 

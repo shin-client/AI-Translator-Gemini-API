@@ -114,5 +114,105 @@
   "COPY_ICON_TOOLTIP": {
     "message": "复制到剪贴板",
     "description": "Tooltip for copy icon"
+  },
+  "language_de": {
+    "message": "德语",
+    "description": "German language label"
+  },
+  "language_es": {
+    "message": "西班牙语",
+    "description": "Spanish language label"
+  },
+  "language_fr": {
+    "message": "法语",
+    "description": "French language label"
+  },
+  "language_it": {
+    "message": "意大利语",
+    "description": "Italian language label"
+  },
+  "language_pt": {
+    "message": "葡萄牙语",
+    "description": "Portuguese language label"
+  },
+  "language_ru": {
+    "message": "俄语",
+    "description": "Russian language label"
+  },
+  "language_zh": {
+    "message": "中文",
+    "description": "Chinese language label"
+  },
+  "language_ja": {
+    "message": "日语",
+    "description": "Japanese language label"
+  },
+  "language_ko": {
+    "message": "韩语",
+    "description": "Korean language label"
+  },
+  "language_uk": {
+    "message": "乌克兰语",
+    "description": "Ukrainian language label"
+  },
+  "TRANSLATE_TEXT_BUTTON_TEXT": {
+    "message": "翻译",
+    "description": "Translate button text"
+  },
+  "API_KEY_PLACEHOLDER": {
+    "message": "输入您的Gemini API密钥",
+    "description": "API key input placeholder"
+  },
+  "TRANSLATION_FAILED_MESSAGE": {
+    "message": "翻译失败",
+    "description": "General translation error"
+  },
+  "COPY_SUCCESS_MESSAGE": {
+    "message": "文本已复制！",
+    "description": "Copy success message"
+  },
+  "COPY_NO_TEXT_MESSAGE": {
+    "message": "没有文本可复制",
+    "description": "No text to copy message"
+  },
+  "COPY_FAILED_MESSAGE": {
+    "message": "复制文本失败",
+    "description": "Copy failed message"
+  },
+  "HISTORY_CARD_HEADER_TITLE": {
+    "message": "历史记录",
+    "description": "History section header"
+  },
+  "HISTORY_RESTORE_BUTTON_TEXT": {
+    "message": "恢复",
+    "description": "Restore translation button"
+  },
+  "HISTORY_CLEAR_BUTTON_TEXT": {
+    "message": "清除历史",
+    "description": "Clear history button"
+  },
+  "HISTORY_EMPTY_MESSAGE": {
+    "message": "没有翻译历史",
+    "description": "Empty history message"
+  },
+  "HISTORY_DELETE_SELECTED_BUTTON_TEXT": {
+    "message": "删除选中项",
+    "description": "Delete selected history items button"
+  },
+  "HISTORY_SELECT_ALL_BUTTON_TEXT": {
+    "message": "全选",
+    "description": "Select all history items button"
+  },
+  "HISTORY_DESELECT_ALL_BUTTON_TEXT": {
+    "message": "取消全选",
+    "description": "Deselect all history items button"
+  },
+  "HISTORY_ITEM_SELECTED_TOOLTIP": {
+    "message": "点击取消选择",
+    "description": "Tooltip for selected history item"
+  },
+  "HISTORY_ITEM_UNSELECTED_TOOLTIP": {
+    "message": "点击选择",
+    "description": "Tooltip for unselected history item"
   }
 } 

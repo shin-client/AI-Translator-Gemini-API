@@ -114,5 +114,105 @@
   "COPY_ICON_TOOLTIP": {
     "message": "Скопировать в буфер",
     "description": "Tooltip for copy icon"
+  },
+  "language_de": {
+    "message": "Немецкий",
+    "description": "German language label"
+  },
+  "language_es": {
+    "message": "Испанский",
+    "description": "Spanish language label"
+  },
+  "language_fr": {
+    "message": "Французский",
+    "description": "French language label"
+  },
+  "language_it": {
+    "message": "Итальянский",
+    "description": "Italian language label"
+  },
+  "language_pt": {
+    "message": "Португальский",
+    "description": "Portuguese language label"
+  },
+  "language_ru": {
+    "message": "Русский",
+    "description": "Russian language label"
+  },
+  "language_zh": {
+    "message": "Китайский",
+    "description": "Chinese language label"
+  },
+  "language_ja": {
+    "message": "Японский",
+    "description": "Japanese language label"
+  },
+  "language_ko": {
+    "message": "Корейский",
+    "description": "Korean language label"
+  },
+  "language_uk": {
+    "message": "Украинский",
+    "description": "Ukrainian language label"
+  },
+  "TRANSLATE_TEXT_BUTTON_TEXT": {
+    "message": "Перевести",
+    "description": "Translate button text"
+  },
+  "API_KEY_PLACEHOLDER": {
+    "message": "Введите ваш API-ключ Gemini",
+    "description": "API key input placeholder"
+  },
+  "TRANSLATION_FAILED_MESSAGE": {
+    "message": "Ошибка перевода",
+    "description": "General translation error"
+  },
+  "COPY_SUCCESS_MESSAGE": {
+    "message": "Текст скопирован!",
+    "description": "Copy success message"
+  },
+  "COPY_NO_TEXT_MESSAGE": {
+    "message": "Нет текста для копирования",
+    "description": "No text to copy message"
+  },
+  "COPY_FAILED_MESSAGE": {
+    "message": "Не удалось скопировать текст",
+    "description": "Copy failed message"
+  },
+  "HISTORY_CARD_HEADER_TITLE": {
+    "message": "История",
+    "description": "History section header"
+  },
+  "HISTORY_RESTORE_BUTTON_TEXT": {
+    "message": "Восстановить",
+    "description": "Restore translation button"
+  },
+  "HISTORY_CLEAR_BUTTON_TEXT": {
+    "message": "Очистить историю",
+    "description": "Clear history button"
+  },
+  "HISTORY_EMPTY_MESSAGE": {
+    "message": "Нет истории переводов",
+    "description": "Empty history message"
+  },
+  "HISTORY_DELETE_SELECTED_BUTTON_TEXT": {
+    "message": "Удалить выбранные",
+    "description": "Delete selected history items button"
+  },
+  "HISTORY_SELECT_ALL_BUTTON_TEXT": {
+    "message": "Выбрать все",
+    "description": "Select all history items button"
+  },
+  "HISTORY_DESELECT_ALL_BUTTON_TEXT": {
+    "message": "Снять выделение",
+    "description": "Deselect all history items button"
+  },
+  "HISTORY_ITEM_SELECTED_TOOLTIP": {
+    "message": "Нажмите чтобы снять выделение",
+    "description": "Tooltip for selected history item"
+  },
+  "HISTORY_ITEM_UNSELECTED_TOOLTIP": {
+    "message": "Нажмите чтобы выбрать",
+    "description": "Tooltip for unselected history item"
   }
 } 
