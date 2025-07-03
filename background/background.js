@@ -180,12 +180,6 @@ class ApiKeyManager {
 
 const apiKeyManager = new ApiKeyManager();
 
-const validateApiKey = async () => {
-  const { geminiApiKey } = await chrome.storage.local.get(["geminiApiKey"]);
-  if (!geminiApiKey) throw new Error(config.API_KEY_NOT_SET_MESSAGE);
-  return geminiApiKey;
-};
-
 const handleTranslationResponse = (data) => {
   const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
   if (!candidate) throw new Error(config.TRANSLATION_FAILED_MESSAGE);
@@ -196,28 +190,63 @@ const handleTranslationResponse = (data) => {
 };
 
 async function translateText(text, targetLanguage, sendResponse) {
-  try {
-    const geminiApiKey = await validateApiKey();
-    if (!text) throw new Error(config.TRANSLATION_FAILED_MESSAGE);
+  let keyInfo = null;
+  let attempts = 0;
+  const maxAttempts = 3;
 
-    const response = await fetch(`${API_URL}?key=${geminiApiKey}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(translationRequest(text, targetLanguage)),
-    });
+  while (attempts < maxAttempts) {
+    try {
+      keyInfo = await apiKeyManager.getNextAvailableKey();
+      if (!text) throw new Error(config.TRANSLATION_FAILED_MESSAGE);
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || "Unknown error");
+      const response = await fetch(`${API_URL}?key=${keyInfo.key}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(translationRequest(text, targetLanguage)),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+
+        // Handle rate limiting
+        if (response.status === 429) {
+          const retryAfter = response.headers.get("Retry-After") || 60;
+          apiKeyManager.markKeyAsRateLimited(
+            keyInfo.index,
+            parseInt(retryAfter)
+          );
+          attempts++;
+          continue; // Try next key
+        }
+
+        // Handle other errors
+        const error = new Error(errorData.error?.message || "Unknown error");
+        apiKeyManager.markKeyError(keyInfo.index, error.message);
+        attempts++;
+        continue; // Try next key
+      }
+
+      const translatedText = handleTranslationResponse(await response.json());
+      apiKeyManager.markKeySuccess(keyInfo.index);
+      sendResponse({ translatedText });
+      return;
+    } catch (error) {
+      console.error("Translation Error:", error);
+
+      if (keyInfo) {
+        apiKeyManager.markKeyError(keyInfo.index, error.message);
+      }
+
+      attempts++;
+
+      // If this was the last attempt, send error response
+      if (attempts >= maxAttempts) {
+        sendResponse({
+          translatedText: `${config.TRANSLATION_FAILED_MESSAGE}: ${error.message}`,
+        });
+        return;
+      }
     }
-
-    const translatedText = handleTranslationResponse(await response.json());
-    sendResponse({ translatedText });
-  } catch (error) {
-    console.error("Translation Error:", error);
-    sendResponse({
-      translatedText: `${config.TRANSLATION_FAILED_MESSAGE}: ${error.message}`,
-    });
   }
 }
 
@@ -227,9 +256,11 @@ async function captureAndTranslateScreenshot(
   sendResponse,
   tabId
 ) {
-  try {
-    const geminiApiKey = await validateApiKey();
+  let keyInfo = null;
+  let attempts = 0;
+  const maxAttempts = 3;
 
+  try {
     // Capture visible tab
     const screenshot = await chrome.tabs.captureVisibleTab(null, {
       format: "png",
@@ -248,46 +279,89 @@ async function captureAndTranslateScreenshot(
       base64Image
     );
 
-    const response = await fetch(`${API_URL}?key=${geminiApiKey}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(visionRequest),
-    });
+    while (attempts < maxAttempts) {
+      try {
+        keyInfo = await apiKeyManager.getNextAvailableKey();
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || "Unknown error");
-    }
+        const response = await fetch(`${API_URL}?key=${keyInfo.key}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(visionRequest),
+        });
 
-    const data = await response.json();
-    const result = handleTranslationResponse(data);
+        if (!response.ok) {
+          const errorData = await response.json();
 
-    // Extract translation part with improved pattern matching
-    const translationMatch = result.match(
-      /TRANSLATION:\s*([\s\S]*?)(?=\n\n|$)/
-    );
-    let translatedText = translationMatch ? translationMatch[1].trim() : result;
+          // Handle rate limiting
+          if (response.status === 429) {
+            const retryAfter = response.headers.get("Retry-After") || 60;
+            apiKeyManager.markKeyAsRateLimited(
+              keyInfo.index,
+              parseInt(retryAfter)
+            );
+            attempts++;
+            continue; // Try next key
+          }
 
-    // Fallback: if no TRANSLATION section found, return the whole result
-    if (!translationMatch && result.includes("TRANSCRIPTION:")) {
-      // If we have transcription but no clear translation, try to extract after transcription
-      const afterTranscription = result.split("TRANSCRIPTION:")[1];
-      if (afterTranscription) {
-        translatedText = afterTranscription
-          .replace(/^[\s\S]*?TRANSLATION:\s*/, "")
+          // Handle other errors
+          const error = new Error(errorData.error?.message || "Unknown error");
+          apiKeyManager.markKeyError(keyInfo.index, error.message);
+          attempts++;
+          continue; // Try next key
+        }
+
+        const data = await response.json();
+        const result = handleTranslationResponse(data);
+
+        // Extract translation part with improved pattern matching
+        const translationMatch = result.match(
+          /TRANSLATION:\s*([\s\S]*?)(?=\n\n|$)/
+        );
+        let translatedText = translationMatch
+          ? translationMatch[1].trim()
+          : result;
+
+        // Fallback: if no TRANSLATION section found, return the whole result
+        if (!translationMatch && result.includes("TRANSCRIPTION:")) {
+          // If we have transcription but no clear translation, try to extract after transcription
+          const afterTranscription = result.split("TRANSCRIPTION:")[1];
+          if (afterTranscription) {
+            translatedText = afterTranscription
+              .replace(/^[\s\S]*?TRANSLATION:\s*/, "")
+              .trim();
+          }
+        }
+
+        // Clean up any remaining formatting artifacts
+        translatedText = translatedText
+          .replace(/^\[.*?\]\s*/, "")
+          .replace(/\[unclear\]/g, "")
           .trim();
+
+        apiKeyManager.markKeySuccess(keyInfo.index);
+        sendResponse({ translatedText });
+        return;
+      } catch (error) {
+        console.error("Screenshot translation error:", error);
+
+        if (keyInfo) {
+          apiKeyManager.markKeyError(keyInfo.index, error.message);
+        }
+
+        attempts++;
+
+        // If this was the last attempt, send error response
+        if (attempts >= maxAttempts) {
+          sendResponse({
+            error: error.message,
+            translatedText: `${config.TRANSLATION_FAILED_MESSAGE}: ${error.message}`,
+          });
+          return;
+        }
       }
     }
-
-    // Clean up any remaining formatting artifacts
-    translatedText = translatedText
-      .replace(/^\[.*?\]\s*/, "")
-      .replace(/\[unclear\]/g, "")
-      .trim();
-
-    sendResponse({ translatedText });
   } catch (error) {
-    console.error("Screenshot translation error:", error);
+    console.error("Screenshot capture error:", error);
     sendResponse({
       error: error.message,
       translatedText: `${config.TRANSLATION_FAILED_MESSAGE}: ${error.message}`,
