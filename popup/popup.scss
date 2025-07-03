@@ -650,10 +650,10 @@ body {
 .aiGeminiTranslator_button.aiGeminiTranslator_secondary {
   background-color: #424242;
   border: 1px solid #616161;
-}
 
-.aiGeminiTranslator_button.aiGeminiTranslator_secondary:hover {
-  background-color: #515151;
+  &:hover {
+    background-color: #515151;
+  }
 }
 
 .aiGeminiTranslator_api-keys-list {
@@ -713,7 +713,161 @@ body {
   }
 }
 
-// YouTube Settings
+/* Custom scrollbar for API keys container */
+.aiGeminiTranslator_api-keys-container {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #2c2c2c;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #9c6ad0;
+    border-radius: 3px;
+
+    &:hover {
+      background: #b388d4;
+    }
+  }
+}
+
+.aiGeminiTranslator_api-key-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  margin: 0;
+  background-color: #2c2c2c;
+  border: 1px solid #424242;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  min-height: 44px;
+
+  &.healthy {
+    border-left: 3px solid #4caf50;
+  }
+
+  &.rate-limited {
+    border-left: 3px solid #ff9800;
+  }
+
+  &.error {
+    border-left: 3px solid #f44336;
+  }
+}
+
+.aiGeminiTranslator_api-key-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.aiGeminiTranslator_api-key-display {
+  color: #e0e0e0;
+  font-family: monospace;
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.aiGeminiTranslator_api-key-status-text {
+  font-size: 0.75rem;
+  margin-top: 2px;
+
+  &.healthy {
+    color: #4caf50;
+  }
+
+  &.rate-limited {
+    color: #ff9800;
+  }
+
+  &.error {
+    color: #f44336;
+  }
+}
+
+.aiGeminiTranslator_api-key-remove {
+  background: none;
+  border: none;
+  color: #f44336;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 0.8rem;
+  border-radius: 2px;
+  margin-left: 8px;
+
+  &:hover {
+    background-color: #f44336;
+    color: white;
+  }
+}
+
+.aiGeminiTranslator_api-status-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+.aiGeminiTranslator_api-status-content {
+  background-color: #2c2c2c;
+  border: 1px solid #424242;
+  border-radius: 8px;
+  padding: 20px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80%;
+  overflow-y: auto;
+}
+
+.aiGeminiTranslator_api-status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+
+  h3 {
+    margin: 0;
+    color: #9c6ad0;
+  }
+}
+
+.aiGeminiTranslator_api-status-close {
+  background: none;
+  border: none;
+  color: #e0e0e0;
+  cursor: pointer;
+  font-size: 1.5rem;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: #f44336;
+  }
+}
+
+/* YouTube Settings Styles */
 .aiGeminiTranslator_youtube-settings {
   margin-top: $spacing-xl;
   padding-top: $spacing-xl;

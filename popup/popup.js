@@ -80,6 +80,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     deleteSelectedButton: document.getElementById(
       "aiGeminiTranslator_delete-selected-button"
     ),
+    apiKeysContainer: document.getElementById(
+      "aiGeminiTranslator_api-keys-container"
+    ),
+    youtubeSubtitleToggle: document.getElementById(
+      "aiGeminiTranslator_youtube-subtitle-toggle"
+    ),
   };
 
   // Initialize text content and placeholders
