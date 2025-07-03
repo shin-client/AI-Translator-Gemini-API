@@ -19,11 +19,7 @@
       "48": "icons/icon48.png"
     }
   },
-  "permissions": [
-    "storage",
-    "activeTab",
-    "tabs"
-  ],
+  "permissions": ["storage", "activeTab", "tabs"],
   "host_permissions": [
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent"
   ],
@@ -41,12 +37,10 @@
       "js": ["content/content.js"]
     }
   ],
-  "web_accessible_resources": [{
-    "resources": [
-      "icons/*.png",
-      "icons/*.svg",
-      "popup/popup.html"
-    ],
-    "matches": ["<all_urls>"]
-  }]
-} 
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*.png", "icons/*.svg", "popup/popup.html"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
