@@ -54,6 +54,7 @@ const config = {
         { value: 'it', label: chrome.i18n.getMessage('language_it') },
         { value: 'pt', label: chrome.i18n.getMessage('language_pt') },
         { value: 'ru', label: chrome.i18n.getMessage('language_ru') },
+        { value: 'vi', label: chrome.i18n.getMessage('language_vi') },
         { value: 'zh', label: chrome.i18n.getMessage('language_zh') },
         { value: 'ja', label: chrome.i18n.getMessage('language_ja') },
         { value: 'ko', label: chrome.i18n.getMessage('language_ko') },

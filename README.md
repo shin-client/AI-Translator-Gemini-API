@@ -2,7 +2,7 @@
 
 ![AI-Translator-Gemini-API-Banner](images/banner.jpg)
 
-![AI-Translator-Gemini-API-Icon](icons/icon128.png) AI Translator Gemini API
+AI Translator Gemini API
 
 This Chrome extension allows you to quickly translate selected text on any webpage using the Google Gemini API. You can also translate any text directly within the extension's popup.
 

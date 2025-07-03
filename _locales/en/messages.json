@@ -147,6 +147,10 @@
     "message": "Ukrainian",
     "description": "Ukrainian language label"
   },
+  "language_vi": {
+    "message": "Vietnamese",
+    "description": "Vietnamese language label"
+  },
   "COPY_SUCCESS_MESSAGE": {
     "message": "Text copied to clipboard!",
     "description": "Copy success message"
@@ -194,5 +198,65 @@
   "HISTORY_ITEM_UNSELECTED_TOOLTIP": {
     "message": "Click to select",
     "description": "Tooltip for unselected history item"
+  },
+  "ADD_API_KEY_BUTTON_TEXT": {
+    "message": "Add API Key",
+    "description": "Add API key button text"
+  },
+  "VIEW_API_STATUS_BUTTON_TEXT": {
+    "message": "View Status",
+    "description": "View API status button text"
+  },
+  "API_KEY_ADDED_SUCCESS": {
+    "message": "API key added successfully!",
+    "description": "API key added success message"
+  },
+  "API_KEY_ALREADY_EXISTS": {
+    "message": "API key already exists",
+    "description": "API key already exists error"
+  },
+  "API_KEY_REMOVED_SUCCESS": {
+    "message": "API key removed successfully",
+    "description": "API key removed success message"
+  },
+  "API_KEY_INVALID_FORMAT": {
+    "message": "Invalid API key format",
+    "description": "Invalid API key format error"
+  },
+  "REMOVE_API_KEY_CONFIRM": {
+    "message": "Are you sure you want to remove this API key?",
+    "description": "Remove API key confirmation message"
+  },
+  "API_KEYS_STATUS_TITLE": {
+    "message": "API Keys Status",
+    "description": "API keys status modal title"
+  },
+  "NO_API_KEYS_CONFIGURED": {
+    "message": "No API keys configured",
+    "description": "No API keys message"
+  },
+  "API_KEY_READY": {
+    "message": "Ready",
+    "description": "API key ready status"
+  },
+  "API_KEY_RATE_LIMITED": {
+    "message": "Rate limited",
+    "description": "API key rate limited status"
+  },
+  "API_KEY_ERROR_STATUS": {
+    "message": "Error",
+    "description": "API key error status"
+  },
+  "YOUTUBE_SETTINGS_TITLE": {
+    "message": "YouTube Features",
+    "description": "YouTube settings section title"
+  },
+  "YOUTUBE_SUBTITLE_LABEL": {
+    "message": "Auto-translate YouTube subtitles",
+    "description": "YouTube subtitle translation toggle label"
+  },
+  "YOUTUBE_SUBTITLE_DESCRIPTION": {
+    "message": "Automatically translate YouTube video subtitles in real-time. You can also toggle this feature directly on YouTube with the translate button in the video controls.",
+    "description": "YouTube subtitle translation toggle description"
   }
 }
