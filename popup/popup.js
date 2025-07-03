@@ -38,6 +38,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     saveApiKeyButton: document.getElementById(
       "aiGeminiTranslator_save-api-key-button"
     ),
+    showApiStatusButton: document.getElementById(
+      "aiGeminiTranslator_show-api-status-button"
+    ),
     textToTranslateTextarea: document.getElementById(
       "aiGeminiTranslator_text-to-translate"
     ),
@@ -658,6 +661,271 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  // API Keys Management Functions
+  function showStatus(element, message, type = "info") {
+    element.textContent = message;
+    element.style.display = "block";
+
+    // Set color based on type
+    switch (type) {
+      case "success":
+        element.style.color = "#4caf50";
+        break;
+      case "error":
+        element.style.color = "#f44336";
+        break;
+      case "warning":
+        element.style.color = "#ff9800";
+        break;
+      default:
+        element.style.color = "#2196f3";
+    }
+
+    // Auto hide after 3 seconds
+    setTimeout(() => {
+      element.style.display = "none";
+    }, 3000);
+  }
+
+  async function removeApiKey(index) {
+    if (!confirm("Are you sure you want to remove this API key?")) {
+      return;
+    }
+
+    try {
+      const { geminiApiKeys = [] } = await chrome.storage.local.get([
+        "geminiApiKeys",
+      ]);
+      const updatedKeys = geminiApiKeys.filter((_, i) => i !== index);
+
+      await chrome.storage.local.set({ geminiApiKeys: updatedKeys });
+      await loadApiKeys();
+
+      showStatus(
+        elements.apiKeyStatus,
+        `API key removed. Remaining: ${updatedKeys.length}`,
+        "success"
+      );
+    } catch (error) {
+      console.error("Failed to remove API key:", error);
+      showStatus(elements.apiKeyStatus, "Failed to remove API key", "error");
+    }
+  }
+
+  async function loadApiKeys() {
+    try {
+      const { geminiApiKeys = [] } = await chrome.storage.local.get([
+        "geminiApiKeys",
+      ]);
+      renderApiKeysList(geminiApiKeys);
+      return geminiApiKeys;
+    } catch (error) {
+      console.warn("Failed to load API keys:", error);
+      return [];
+    }
+  }
+
+  function renderApiKeysList(apiKeys) {
+    elements.apiKeysContainer.innerHTML = "";
+
+    if (apiKeys.length === 0) {
+      const emptyState = document.createElement("div");
+      emptyState.className = "aiGeminiTranslator_empty-state";
+      emptyState.innerHTML = `
+                <div style="color: #888; font-size: 0.8rem; text-align: center; padding: 20px; border: 1px dashed #424242; border-radius: 4px; background-color: #252525;">
+                    <div style="margin-bottom: 8px;">🔑</div>
+                    <div>No API keys added yet</div>
+                    <div style="font-size: 0.7rem; color: #666; margin-top: 4px;">Add your first API key above</div>
+                </div>
+            `;
+      elements.apiKeysContainer.appendChild(emptyState);
+      return;
+    }
+
+    apiKeys.forEach((key, index) => {
+      const keyItem = createApiKeyItem(key, index);
+      elements.apiKeysContainer.appendChild(keyItem);
+    });
+  }
+
+  function createApiKeyItem(apiKey, index) {
+    const item = document.createElement("div");
+    item.className = "aiGeminiTranslator_api-key-item healthy";
+    item.dataset.index = index;
+
+    const maskedKey =
+      apiKey.substring(0, 8) + "..." + apiKey.substring(apiKey.length - 4);
+
+    item.innerHTML = `
+            <div class="aiGeminiTranslator_api-key-info">
+                <div class="aiGeminiTranslator_api-key-display">${maskedKey}</div>
+                <div class="aiGeminiTranslator_api-key-status-text healthy">Ready</div>
+            </div>
+            <button class="aiGeminiTranslator_api-key-remove" title="Remove API Key">×</button>
+        `;
+
+    // Add remove functionality
+    const removeButton = item.querySelector(
+      ".aiGeminiTranslator_api-key-remove"
+    );
+    removeButton.addEventListener("click", () => removeApiKey(index));
+
+    return item;
+  }
+
+  async function addApiKey() {
+    const newKey = elements.apiKeyInput.value.trim();
+
+    if (!newKey) {
+      showStatus(
+        elements.apiKeyStatus,
+        chrome.i18n.getMessage("API_KEY_EMPTY_MESSAGE"),
+        "error"
+      );
+      return;
+    }
+
+    // Validate API key format (basic check)
+    if (!newKey.startsWith("AIza") && !newKey.match(/^[A-Za-z0-9_-]{39}$/)) {
+      showStatus(elements.apiKeyStatus, "Invalid API key format", "error");
+      return;
+    }
+
+    try {
+      const { geminiApiKeys = [] } = await chrome.storage.local.get([
+        "geminiApiKeys",
+      ]);
+
+      // Check if key already exists
+      if (geminiApiKeys.includes(newKey)) {
+        showStatus(elements.apiKeyStatus, "API key already exists", "error");
+        return;
+      }
+
+      // Add new key
+      const updatedKeys = [...geminiApiKeys, newKey];
+      await chrome.storage.local.set({ geminiApiKeys: updatedKeys });
+
+      // Clear input and refresh list
+      elements.apiKeyInput.value = "";
+      await loadApiKeys();
+
+      showStatus(
+        elements.apiKeyStatus,
+        `API key added successfully! Total: ${updatedKeys.length}`,
+        "success"
+      );
+    } catch (error) {
+      console.error("Failed to add API key:", error);
+      showStatus(elements.apiKeyStatus, "Failed to add API key", "error");
+    }
+  }
+
+  function showApiStatusModal(statusList) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById("aiGeminiTranslator_api-status-modal");
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "aiGeminiTranslator_api-status-modal";
+      modal.className = "aiGeminiTranslator_api-status-modal";
+
+      modal.innerHTML = `
+                <div class="aiGeminiTranslator_api-status-content">
+                    <div class="aiGeminiTranslator_api-status-header">
+                        <h3>API Keys Status</h3>
+                        <button class="aiGeminiTranslator_api-status-close">×</button>
+                    </div>
+                    <div id="aiGeminiTranslator_api-status-body"></div>
+                </div>
+            `;
+
+      document.body.appendChild(modal);
+
+      // Add close functionality
+      modal
+        .querySelector(".aiGeminiTranslator_api-status-close")
+        .addEventListener("click", () => {
+          modal.classList.add("hidden");
+        });
+
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          modal.classList.add("hidden");
+        }
+      });
+    }
+
+    // Update content
+    const body = modal.querySelector("#aiGeminiTranslator_api-status-body");
+    body.innerHTML = "";
+
+    if (statusList.length === 0) {
+      body.innerHTML =
+        '<div style="text-align: center; color: #666; padding: 20px;">No API keys configured</div>';
+    } else {
+      statusList.forEach((status) => {
+        const statusItem = document.createElement("div");
+        statusItem.className = `aiGeminiTranslator_api-key-item ${
+          status.healthy
+            ? "healthy"
+            : status.isRateLimited
+            ? "rate-limited"
+            : "error"
+        }`;
+
+        let statusText = "Ready";
+        if (status.isRateLimited) {
+          statusText = `Rate limited (${status.rateLimitEndsIn}s)`;
+        } else if (!status.healthy) {
+          statusText = `Error (${status.errorCount} failures)`;
+        }
+
+        statusItem.innerHTML = `
+                    <div class="aiGeminiTranslator_api-key-info">
+                        <div class="aiGeminiTranslator_api-key-display">Key #${
+                          status.index
+                        }: ${status.key}</div>
+                        <div class="aiGeminiTranslator_api-key-status-text ${
+                          status.healthy
+                            ? "healthy"
+                            : status.isRateLimited
+                            ? "rate-limited"
+                            : "error"
+                        }">
+                            ${statusText}
+                        </div>
+                    </div>
+                `;
+
+        body.appendChild(statusItem);
+      });
+    }
+
+    modal.classList.remove("hidden");
+  }
+
+  async function showApiKeysStatus() {
+    try {
+      const response = await chrome.runtime.sendMessage({
+        action: "getApiKeyStatus",
+      });
+
+      if (response.error) {
+        showStatus(elements.apiKeyStatus, response.error, "error");
+        return;
+      }
+
+      showApiStatusModal(response.status);
+    } catch (error) {
+      console.error("Failed to get API key status:", error);
+      showStatus(
+        elements.apiKeyStatus,
+        "Failed to get API key status",
+        "error"
+      );
+    }
+  }
+
   // Event listeners
   elements.settingsHeader.addEventListener("click", (e) => {
     e.preventDefault();
@@ -680,48 +948,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 300);
   });
 
-  elements.saveApiKeyButton.addEventListener("click", async () => {
-    const newApiKey = elements.apiKeyInput.value.trim();
-    if (!newApiKey) return updateStatus("API_KEY_EMPTY_MESSAGE", "red");
+  elements.saveApiKeyButton.addEventListener("click", addApiKey);
 
-    updateStatus("API_KEY_VALIDATION_MESSAGE", "orange");
-
-    try {
-      const response = await fetch(`${API_URL}?key=${newApiKey}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(config.TEST_MESSAGE_REQUEST_BODY),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("API Error:", errorData);
-        return updateStatus("API_KEY_INVALID_MESSAGE", "red");
-      }
-
-      const data = await response.json();
-      if (
-        !data?.candidates?.[0]?.content?.parts?.[0]?.text
-          ?.trim()
-          .toLowerCase()
-          .includes("test")
-      ) {
-        return updateStatus("API_KEY_INVALID_MESSAGE", "red");
-      }
-
-      updateStatus("API_KEY_VALID_MESSAGE", "green");
-      await chrome.storage.local.set({ geminiApiKey: newApiKey });
-      apiKey = newApiKey;
-      elements.apiKeyInput.value = newApiKey;
-      elements.apiKeyClearIcon.classList.add("active");
-      elements.apiKeyStatusIcon.classList.add("valid");
-    } catch (error) {
-      console.error("Error during API key validation:", error);
-      updateStatus(`Error: ${error.message}`, "red");
-    }
-  });
+  elements.showApiStatusButton.addEventListener("click", showApiKeysStatus);
 
   elements.translateTextButton.addEventListener("click", translateText);
+
   elements.textTargetLanguageSelect.addEventListener("change", async () => {
     await chrome.storage.local.set({
       textTargetLanguage: elements.textTargetLanguageSelect.value,
@@ -853,8 +1085,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Initialize language selects
-  await initializeSelects();
+  // Initialize UI components
+  await Promise.all([
+    initializeSelects(),
+    loadApiKeys(),
+    loadTranslationHistory(),
+  ]);
 
   // Set up CSS variables
   document.documentElement.style.setProperty(
@@ -870,7 +1106,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     `url("${config.COPY_ICON_SVG}")`
   );
   document.documentElement.style.setProperty("--copy-error-color", "#ff4444");
-
-  // Load translation history on initialization
-  await loadTranslationHistory();
 });
