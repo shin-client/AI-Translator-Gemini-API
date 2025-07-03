@@ -106,24 +106,37 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Load API key, target language, and last translation session from storage
   const {
     geminiApiKey,
+    geminiApiKeys,
     textTargetLanguage,
     selectedTextLanguage,
     lastTranslationSession,
+    youtubeSubtitleTranslation,
   } = await chrome.storage.local.get([
     "geminiApiKey",
+    "geminiApiKeys",
     "textTargetLanguage",
     "selectedTextLanguage",
     "lastTranslationSession",
+    "youtubeSubtitleTranslation",
   ]);
-  if (geminiApiKey) {
-    apiKey = geminiApiKey;
-    elements.apiKeyInput.value = geminiApiKey;
-    elements.apiKeyClearIcon.classList.add("active");
-    elements.apiKeyStatusIcon.classList.add("valid");
-    elements.apiStatusTooltip.textContent = chrome.i18n.getMessage(
-      "API_STATUS_VALID_TOOLTIP"
-    );
-    elements.apiStatusTooltip.style.color = "#4CAF50";
+
+  // Check if we have any API keys (new multi-key system or legacy single key)
+  const hasApiKeys =
+    (geminiApiKeys && geminiApiKeys.length > 0) || geminiApiKey;
+
+  if (hasApiKeys) {
+    // For backward compatibility, show first available key
+    const displayKey = geminiApiKey || (geminiApiKeys && geminiApiKeys[0]);
+    if (displayKey) {
+      apiKey = displayKey;
+      elements.apiKeyInput.value = displayKey;
+      elements.apiKeyClearIcon.classList.add("active");
+      elements.apiKeyStatusIcon.classList.add("valid");
+      elements.apiStatusTooltip.textContent = chrome.i18n.getMessage(
+        "API_STATUS_VALID_TOOLTIP"
+      );
+      elements.apiStatusTooltip.style.color = "#4CAF50";
+    }
   } else {
     elements.apiStatusTooltip.textContent = chrome.i18n.getMessage(
       "API_STATUS_INVALID_TOOLTIP"
@@ -134,6 +147,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   elements.textTargetLanguageSelect.value =
     textTargetLanguage || config.DEFAULT_TARGET_LANGUAGE;
   elements.selectedTextLanguageSelect.value = selectedTextLanguage || "English";
+
+  // Load YouTube settings
+  if (elements.youtubeSubtitleToggle) {
+    elements.youtubeSubtitleToggle.checked =
+      youtubeSubtitleTranslation || false;
+  }
 
   // Restore last translation session if available
   if (lastTranslationSession) {
@@ -489,9 +508,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function translateText() {
-    if (!apiKey)
-      return updateTranslationStatus("API_KEY_NOT_SET_MESSAGE", "red");
-
     const text = elements.textToTranslateTextarea.value.trim();
     const targetLanguage = elements.textTargetLanguageSelect.value;
 
@@ -502,29 +518,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     elements.translatedTextTextarea.value = "";
 
     try {
-      const response = await fetch(`${API_URL}?key=${apiKey}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(translationRequest(text, targetLanguage)),
+      // Use background script with ApiKeyManager
+      const response = await chrome.runtime.sendMessage({
+        action: "translateSelectedText",
+        text: text,
+        targetLanguage: targetLanguage,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("API Error:", errorData);
-        return updateTranslationStatus(
-          `${chrome.i18n.getMessage("TRANSLATION_FAILED_MESSAGE")}: ${
-            errorData.error?.message || "Unknown error"
-          }`,
-          "red"
-        );
-      }
+      if (response && response.translatedText) {
+        // Check if it's an error message
+        if (response.translatedText.startsWith("Translation failed:")) {
+          updateTranslationStatus(response.translatedText, "red");
+          return;
+        }
 
-      const data = await response.json();
-      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        const translatedText = data.candidates[0].content.parts[0].text
-          .replace(/^["']|["']$/g, "")
-          .replace(/^Translate to.*?: /i, "");
-        elements.translatedTextTextarea.value = translatedText;
+        elements.translatedTextTextarea.value = response.translatedText;
         updateTranslationStatus("TRANSLATION_COMPLETE_MESSAGE", "green");
 
         // Save session after successful translation
@@ -533,7 +541,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Add to history after successful translation
         await addToHistory(
           elements.textToTranslateTextarea.value,
-          translatedText,
+          response.translatedText,
           elements.textTargetLanguageSelect.value,
           elements.selectedTextLanguageSelect.value
         );
@@ -547,9 +555,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function translateSelectedTextInPopup(selectedText) {
-    if (!apiKey)
-      return updateTranslationStatus("API_KEY_NOT_SET_MESSAGE", "red");
-
     const targetLanguage = elements.textTargetLanguageSelect.value;
 
     if (!selectedText) return;
@@ -558,37 +563,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateTranslationStatus("TRANSLATION_IN_PROGRESS_MESSAGE", "yellow");
 
     try {
-      const response = await fetch(`${API_URL}?key=${apiKey}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(translationRequest(selectedText, targetLanguage)),
+      // Use background script with ApiKeyManager
+      const response = await chrome.runtime.sendMessage({
+        action: "translateSelectedText",
+        text: selectedText,
+        targetLanguage: targetLanguage,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("API Error:", errorData);
-        return updateTranslationStatus(
-          `${chrome.i18n.getMessage("TRANSLATION_FAILED_MESSAGE")}: ${
-            errorData.error?.message || "Unknown error"
-          }`,
-          "red"
-        );
-      }
-
-      const data = await response.json();
-      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        const translatedText = data.candidates[0].content.parts[0].text
-          .replace(/^["']|["']$/g, "")
-          .replace(/^Translate to.*?: /i, "");
+      if (response && response.translatedText) {
+        // Check if it's an error message
+        if (response.translatedText.startsWith("Translation failed:")) {
+          updateTranslationStatus(response.translatedText, "red");
+          return;
+        }
 
         // Replace the current translated text with selection translation
-        elements.translatedTextTextarea.value = translatedText;
+        elements.translatedTextTextarea.value = response.translatedText;
         updateTranslationStatus("TRANSLATION_COMPLETE_MESSAGE", "green");
 
         // Add to history
         await addToHistory(
           selectedText,
-          translatedText,
+          response.translatedText,
           targetLanguage,
           elements.selectedTextLanguageSelect.value
         );
@@ -791,8 +787,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // Validate API key format (basic check)
-    if (!newKey.startsWith("AIza") && !newKey.match(/^[A-Za-z0-9_-]{39}$/)) {
+    // Validate API key format (improved check)
+    if (!isValidApiKeyFormat(newKey)) {
       showStatus(elements.apiKeyStatus, "Invalid API key format", "error");
       return;
     }
@@ -808,9 +804,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
+      // Test API key before adding
+      showStatus(elements.apiKeyStatus, "Testing API key...", "info");
+
+      const isValid = await testApiKey(newKey);
+      if (!isValid) {
+        showStatus(
+          elements.apiKeyStatus,
+          "API key test failed - invalid key",
+          "error"
+        );
+        return;
+      }
+
       // Add new key
       const updatedKeys = [...geminiApiKeys, newKey];
       await chrome.storage.local.set({ geminiApiKeys: updatedKeys });
+
+      // Also set as legacy single key for backward compatibility
+      if (geminiApiKeys.length === 0) {
+        await chrome.storage.local.set({ geminiApiKey: newKey });
+        apiKey = newKey;
+        elements.apiKeyClearIcon.classList.add("active");
+        elements.apiKeyStatusIcon.classList.add("valid");
+        elements.apiStatusTooltip.textContent = chrome.i18n.getMessage(
+          "API_STATUS_VALID_TOOLTIP"
+        );
+        elements.apiStatusTooltip.style.color = "#4CAF50";
+      }
 
       // Clear input and refresh list
       elements.apiKeyInput.value = "";
@@ -818,12 +839,96 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       showStatus(
         elements.apiKeyStatus,
-        `API key added successfully! Total: ${updatedKeys.length}`,
+        `API key validated and added! Total: ${updatedKeys.length}`,
         "success"
       );
     } catch (error) {
       console.error("Failed to add API key:", error);
       showStatus(elements.apiKeyStatus, "Failed to add API key", "error");
+    }
+  }
+
+  // Validate API key format function
+  function isValidApiKeyFormat(key) {
+    // Google API keys typically start with "AIza" and are 39 characters long
+    // But some might have different patterns, so we'll be more flexible
+    if (key.startsWith("AIza") && key.length === 39) {
+      return true;
+    }
+
+    // Alternative pattern: check for alphanumeric characters, underscores, hyphens
+    // Length should be between 30-50 characters for most Google API keys
+    if (key.length >= 30 && key.length <= 50 && /^[A-Za-z0-9_-]+$/.test(key)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  // Test API key function with timeout
+  async function testApiKey(key) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+      const testResponse = await fetch(`${API_URL}?key=${key}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: "Test" }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 5,
+          },
+        }),
+      });
+
+      clearTimeout(timeoutId);
+
+      // Check if response is successful (not rate limited or invalid)
+      if (testResponse.ok) {
+        const result = await testResponse.json();
+        return result && result.candidates && result.candidates.length > 0;
+      } else if (testResponse.status === 400) {
+        // 400 might indicate invalid key or malformed request
+        const errorData = await testResponse.json();
+        console.warn("API key test error:", errorData);
+
+        // If error is about API key being invalid, return false
+        if (
+          errorData.error &&
+          errorData.error.message &&
+          errorData.error.message.toLowerCase().includes("api key")
+        ) {
+          return false;
+        }
+
+        // Other 400 errors might be request format issues, key could still be valid
+        return true;
+      } else if (testResponse.status === 429) {
+        // Rate limited, but key might be valid
+        console.warn("API key rate limited during test, assuming valid");
+        return true;
+      } else if (testResponse.status === 403) {
+        // Forbidden - likely invalid key
+        console.warn("API key test forbidden - likely invalid key");
+        return false;
+      } else {
+        console.warn("API key test unexpected status:", testResponse.status);
+        return false;
+      }
+    } catch (error) {
+      if (error.name === "AbortError") {
+        console.warn("API key test timed out");
+        return false;
+      }
+      console.error("API key test failed:", error);
+      return false;
     }
   }
 
@@ -1019,6 +1124,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Zaktualizuj widok selecta
     initializeSelects();
   });
+
+  // YouTube settings event listener
+  if (elements.youtubeSubtitleToggle) {
+    elements.youtubeSubtitleToggle.addEventListener("change", async () => {
+      await chrome.storage.local.set({
+        youtubeSubtitleTranslation: elements.youtubeSubtitleToggle.checked,
+      });
+
+      // Send message to YouTube content script
+      try {
+        const tabs = await chrome.tabs.query({
+          active: true,
+          currentWindow: true,
+        });
+        if (tabs[0] && tabs[0].url.includes("youtube.com")) {
+          await chrome.tabs.sendMessage(tabs[0].id, {
+            action: "updateYouTubeSettings",
+            enabled: elements.youtubeSubtitleToggle.checked,
+            targetLanguage: elements.textTargetLanguageSelect.value,
+          });
+        }
+      } catch (error) {
+        console.warn(
+          "Failed to send message to YouTube content script:",
+          error
+        );
+      }
+    });
+  }
 
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === "local") {

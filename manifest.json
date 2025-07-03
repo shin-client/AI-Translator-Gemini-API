@@ -35,6 +35,11 @@
       "matches": ["<all_urls>"],
       "css": ["content/content.css"],
       "js": ["content/content.js"]
+    },
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["content/youtube.js"],
+      "run_at": "document_end"
     }
   ],
   "web_accessible_resources": [
