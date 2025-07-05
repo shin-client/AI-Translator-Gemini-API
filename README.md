@@ -38,7 +38,7 @@ This Chrome extension allows you to quickly translate selected text on any webpa
       - Your API key is not shared with any third parties.
       - It is used solely for authenticating your requests to the Gemini API.
       - Obtaining an API key is free of charge.
-      - The required model is "gemini-2.0-flash-exp".
+      - The required model is "gemini-2.5-flash".
 2. **To translate text in the popup:**
     - Enter the text you want to translate in the "Translate Text" textarea in the popup.
     - Select the target language.

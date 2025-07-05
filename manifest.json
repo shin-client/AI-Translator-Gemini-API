@@ -21,7 +21,7 @@
   },
   "permissions": ["storage", "activeTab", "tabs"],
   "host_permissions": [
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent"
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'none'"
@@ -35,11 +35,6 @@
       "matches": ["<all_urls>"],
       "css": ["content/content.css"],
       "js": ["content/content.js"]
-    },
-    {
-      "matches": ["*://*.youtube.com/*"],
-      "js": ["content/youtube.js"],
-      "run_at": "document_end"
     }
   ],
   "web_accessible_resources": [

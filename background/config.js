@@ -1,6 +1,6 @@
 const config = {
   API_URL:
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent",
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
   DEFAULT_TARGET_LANGUAGE: "en",
   API_KEY_VALIDATION_MESSAGE: "Validating API key...",
   API_KEY_VALID_MESSAGE: "API key is valid",
@@ -18,7 +18,7 @@ const config = {
   TEXT_TO_TRANSLATE_PLACEHOLDER: "Enter text to translate",
   TRANSLATED_TEXT_PLACEHOLDER: "Translation",
   TEXT_TRANSLATION_STATUS_MESSAGE: "Text translation status",
-  API_KEY_PLACEHOLDER: "Enter your Gemini-2.0-flash API Key",
+  API_KEY_PLACEHOLDER: "Enter your Gemini-2.5-flash API Key",
   API_KEY_CARD_HEADER_TITLE: "API Key",
   SETTINGS_CARD_HEADER_TITLE: "Settings",
   TRANSLATION_CARD_HEADER_TITLE: "Translation",

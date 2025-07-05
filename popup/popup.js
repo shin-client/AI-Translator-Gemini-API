@@ -1,5 +1,4 @@
 import config from "../background/config.js";
-import translationRequest from "../background/translationRequest.js";
 
 // Define text elements for dynamic content
 const textElements = {
@@ -27,9 +26,6 @@ const textElements = {
 const systemLanguage = chrome.i18n.getUILanguage().split("-")[0];
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // Get API URL from config
-  const API_URL =
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent";
   let apiKey = "";
 
   // Get DOM elements
@@ -83,9 +79,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     apiKeysContainer: document.getElementById(
       "aiGeminiTranslator_api-keys-container"
     ),
-    youtubeSubtitleToggle: document.getElementById(
-      "aiGeminiTranslator_youtube-subtitle-toggle"
-    ),
   };
 
   // Initialize text content and placeholders
@@ -110,14 +103,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     textTargetLanguage,
     selectedTextLanguage,
     lastTranslationSession,
-    youtubeSubtitleTranslation,
   } = await chrome.storage.local.get([
     "geminiApiKey",
     "geminiApiKeys",
     "textTargetLanguage",
     "selectedTextLanguage",
     "lastTranslationSession",
-    "youtubeSubtitleTranslation",
   ]);
 
   // Check if we have any API keys (new multi-key system or legacy single key)
@@ -147,12 +138,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   elements.textTargetLanguageSelect.value =
     textTargetLanguage || config.DEFAULT_TARGET_LANGUAGE;
   elements.selectedTextLanguageSelect.value = selectedTextLanguage || "English";
-
-  // Load YouTube settings
-  if (elements.youtubeSubtitleToggle) {
-    elements.youtubeSubtitleToggle.checked =
-      youtubeSubtitleTranslation || false;
-  }
 
   // Restore last translation session if available
   if (lastTranslationSession) {
@@ -871,7 +856,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-      const testResponse = await fetch(`${API_URL}?key=${key}`, {
+      const testResponse = await fetch(`${config.API_URL}?key=${key}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
@@ -1124,35 +1109,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Zaktualizuj widok selecta
     initializeSelects();
   });
-
-  // YouTube settings event listener
-  if (elements.youtubeSubtitleToggle) {
-    elements.youtubeSubtitleToggle.addEventListener("change", async () => {
-      await chrome.storage.local.set({
-        youtubeSubtitleTranslation: elements.youtubeSubtitleToggle.checked,
-      });
-
-      // Send message to YouTube content script
-      try {
-        const tabs = await chrome.tabs.query({
-          active: true,
-          currentWindow: true,
-        });
-        if (tabs[0] && tabs[0].url.includes("youtube.com")) {
-          await chrome.tabs.sendMessage(tabs[0].id, {
-            action: "updateYouTubeSettings",
-            enabled: elements.youtubeSubtitleToggle.checked,
-            targetLanguage: elements.textTargetLanguageSelect.value,
-          });
-        }
-      } catch (error) {
-        console.warn(
-          "Failed to send message to YouTube content script:",
-          error
-        );
-      }
-    });
-  }
 
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === "local") {
